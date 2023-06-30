@@ -1,7 +1,7 @@
 import mongoose from 'mongoose'
 
 // DATABASE SCHEMA AND MODEL
-  const userSchema=new mongoose.Schema({
+  const userSchema = new mongoose.Schema({
     username: {
     type:String,
     required:true,
@@ -17,6 +17,6 @@ import mongoose from 'mongoose'
     required:true
     },
   })
-  const user = mongoose.model("users",userSchema)
+  const Users = mongoose.model("users",userSchema)
 ;
- export default user
+ export default Users
