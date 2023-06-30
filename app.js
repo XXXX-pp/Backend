@@ -32,14 +32,15 @@ app.get('/users', (req, res) => {
 })
 
 app.post('/signup', asynHandler( async (req, res) => {
+  console.log(req)
 
-  const { username, mobilenumber, password } = req.body.user
+  const { username, mobilenumber, password } = req.body
 
   const userExist = await users.findOne({ username })
 
   if(userExist){
     res.status(400)
-    throw new Error('Username already exit')
+    throw new Error('Username already exist')
   }
 
   const user = await users.create({ username, mobilenumber, password })
@@ -57,21 +58,10 @@ app.post('/signup', asynHandler( async (req, res) => {
     throw new Error('Invalid User')
   }
 }))
-//   app.post("/signup", async (req, res) => {
-//     const userDetails = req.body.user 
-//     const user = new user(userDetails)
 
-//     user.find({$or: [{username: userDetails.username}, {mobilenumber:userDetails.mobilenumber}]})
-//     .then(async (user) => {
-//     if (user) {
-//         console.log(user)
-//     } else {
-//         await newUser.save()
-//         res.json("User has been created")
-//     }
-//     })
-//   })
-// ;
+
+app.post('/signin')
+
 
 
 // STARTING THE SERVER
