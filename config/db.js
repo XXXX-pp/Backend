@@ -2,7 +2,9 @@ import mongoose from 'mongoose'
 
 const connectDB = async () => {
   try {
-    const conn = await mongoose.connect("mongodb+srv://Master:Password4Mongodb@cluster0.cpjgko5.mongodb.net/?retryWrites=true&w=majority", {
+    const DB_URL= 'mongodb+srv://'+('admin-xxxx')+':'+('xxxx2023')+('@xxxx-database.xt8zh0z.mongodb.net/')+('xxxx-database')+'?retryWrites=true&w=majority'
+
+    const conn = await mongoose.connect(DB_URL, {
       useUnifiedTopology: true,
       useNewUrlParser: true,
       useCreateIndex: true,
