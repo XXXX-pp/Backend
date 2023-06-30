@@ -17,6 +17,6 @@ import mongoose from 'mongoose'
     required:true
     },
   })
-  const user = mongoose.model("users",userSchema)
+  const users = mongoose.model("users",userSchema)
 ;
- export default user
+ export default users

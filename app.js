@@ -2,7 +2,9 @@ import express from 'express'
 import cors from 'cors'
 import connectDB from './config/db.js'
 import cookieParser from 'cookie-parser'
-import user from './model/userModel.js'
+import users from './model/userModel.js'
+import mongoose from 'mongoose'
+
 
 
 connectDB()
@@ -24,31 +26,31 @@ const app = express()
   });
 
   app.get('/users', (req, res) => {
-    user.find({})
+    users.find({})
     .then(function(users){
         res.send(users)
     })
   })
 
   app.post("/signup", async (req, res) => {
-    const userDetails = req.body.user 
-    const user = new user(userDetails)
-
-    user.find({$or: [{username: userDetails.username}, {mobilenumber:userDetails.mobilenumber}]})
-    .then(async (user) => {
-    if (user) {
-        console.log(user)
-    } else {
-        await newUser.save()
-        res.json("User has been created")
-    }
-    })
+    const {username,mobilenumber,password} = req.body.user
+    
+    // Check if user is already registerd
+    // Create a mew user 
   })
+
+  app.post('/signin', async (req, res) => {
+    
+  })
+
+
+
+
 ;
 
 
 // STARTING THE SERVER
-  const PORT = 5000
+  const PORT = 8000
 
   app.listen(
     PORT,
