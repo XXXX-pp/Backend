@@ -1,37 +1,23 @@
 import express from 'express'
 import cors from 'cors'
-import mongoose from 'mongoose'
+import connectDB from './config/db.js'
 import cookieParser from 'cookie-parser'
+import UserModel from './model/userModel.js'
 
+
+connectDB()
 
 const app = express()
+
 app.use(cors())
 app.use(express.json());
 app.use(cookieParser());
 app.use(express.urlencoded({ extended: true}))
-mongoose.set('strictQuery', false)
-
-const DB_URL = "mongodb+srv://Master:Password4Mongodb@cluster0.cpjgko5.mongodb.net/?retryWrites=true&w=majority"
-
-const newSchema=new mongoose.Schema({
-  username: {
-    type:String,
-    required:true,
-    unique: true
-  },
-  mobilenumber: {
-    type:String,
-    required:true,
-    unique: true
-  },
-  password: {
-    type:String,
-    required:true
-  },
-})
 
 
-const UserModel = mongoose.model("Users",newSchema)
+
+
+
 
 app.post("/signup", async (req, res) => {
   const user = req.body.user 
@@ -45,17 +31,16 @@ app.post("/signup", async (req, res) => {
       res.json("User has been created")
   }
   })
+  
 })
 
-async function connect () {
-    try {
-        await mongoose.connect(DB_URL)
-        console.log("connected to database")
-    } catch (error) {
-        console.log(error)
-    }
-}
 
-connect()
 
-app.listen(8000, () => console.log("server running on port 8000"))
+const PORT = 5000
+
+app.listen(
+  PORT,
+  console.log(
+    `Server running  on port ${PORT}`
+  )
+)
