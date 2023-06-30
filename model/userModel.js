@@ -31,9 +31,6 @@ userSchema.methods.matchPassword = async function (enteredPassword) {
 }
 
 
-
-
-
 userSchema.pre('save', async function (next) {
   // Check if the password field is modified
   if (!this.isModified('password')) {
@@ -50,7 +47,6 @@ userSchema.pre('save', async function (next) {
   next();
 });
 
-  const users = mongoose.model("users",userSchema)
 
-
+const users = mongoose.model("users",userSchema)
  export default users

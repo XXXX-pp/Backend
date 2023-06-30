@@ -1,6 +1,12 @@
 import { Router } from "express";
+import { handleLogIn, handleSignUp } from "../controllers/authController.js";
+import asynHandler from 'express-async-handler'
 
-const router = new Router();
 
-router.post('/signup',()=>{} )
-router.post('/signin',()=>{} )
+const authRoutes = new Router();
+
+authRoutes.post('/signup',asynHandler(handleSignUp))
+
+authRoutes.post('/login',asynHandler(handleLogIn))
+
+export default authRoutes;
