@@ -61,7 +61,6 @@ app.post('/signup', asynHandler( async (req, res) => {
   }
 
 
-
 }
 
 ))
