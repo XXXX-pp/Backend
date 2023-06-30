@@ -1,7 +1,7 @@
 import mongoose from 'mongoose'
 
 // DATABASE SCHEMA AND MODEL
-  const userSchema=new mongoose.Schema({
+  const userSchema = new mongoose.Schema({
     username: {
     type:String,
     required:true,
@@ -15,7 +15,7 @@ import mongoose from 'mongoose'
     password: {
     type:String,
     required:true
-    },
+    }
   })
   const users = mongoose.model("users",userSchema)
 ;
