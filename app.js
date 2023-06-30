@@ -5,7 +5,6 @@ import cookieParser from 'cookie-parser'
 import authRoutes from './routes/authRoutes.js'
 import userRoutes from './routes/userRoutes.js'
 
-
 connectDB()
 
 // PACKAGE INITIALIZATIONS
