@@ -43,21 +43,28 @@ export async function createUser(req, res) {
   }
 }
 
-export async function handleLogIn(req, res) {
-  const { username, password } = req.body;
+export async function loginUser(req, res) {
+  try{
+  const { userName, password } = req.body;
 
   // Checking if a user with the same username already exists
-  const user = await users.findOne({ username });
+  const user = await userModel.findOne({ userName });
+  const passwordMatch = await bcrypt.compare(password, user.password)
 
-  if (user && (await user.matchPassword(password))) {
+  if (user && passwordMatch) {
     res.json({
       _id: user._id,
-      username: user.username,
-      mobilenumber: user.mobilenumber,
+      userName: user.userName,
+      phoneNumber: user.phoneNumber,
     });
-  } else {
-    // If user creation fails, send an error response
-    res.status(400);
-    throw new Error("There was an error");
+  }
+  else{
+    throw new Error('Passwords do not match')
+  }
+
+}catch(error){
+    // If user login fails, send an error response
+    console.log(error);
+    return res.status(500).json({ message: `internal server error` });
   }
 }
