@@ -4,7 +4,6 @@ import cookieParser from "cookie-parser";
 import morgan from "morgan";
 import http from "http";
 import dotenv from "dotenv";
-
 import connectDB from "./config/db.js";
 import authRoutes from "./routes/authRoutes.js";
 import userRoutes from "./routes/userRoutes.js";
@@ -12,8 +11,8 @@ import userRoutes from "./routes/userRoutes.js";
 dotenv.config();
 connectDB();
 
-// PACKAGE INITIALIZATIONS
-const port = process.env.PORT;
+
+const port = process.env.PORT || 3000;
 const app = express();
 const server = http.createServer(app);
 app.use(authRoutes);
