@@ -1,7 +1,7 @@
-import users from '../model/userModel.js'
+import {userModel} from '../model/userModel.js'
 
 export default function handleGetUsers(req, res) {
-    users.find({})
+    userModel.find({})
     .then(function (users) {
       res.send(users)
     })
