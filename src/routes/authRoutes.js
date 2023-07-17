@@ -6,8 +6,3 @@ router.post("/signup", createUser);
 router.post("/login", loginUser)
 export default router;
 
-// const authRoutes = new Router();
-// authRoutes.post("/signup", asynHandler(createUser));
-// authRoutes.post("/login", asynHandler(handleLogIn));
-
-// export default authRoutes;
