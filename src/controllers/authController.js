@@ -1,11 +1,10 @@
 import bcrypt from "bcryptjs";
 import { userModel } from "../model/userModel.js";
 
-
 export async function createUser(req, res) {
   try {
     // Extracting the username, mobilenumber, and password from the request body
-    const { firstName, lastName, userName, phoneNumber, password } = req.body;
+    const { userName, phoneNumber, password } = req.body;
 
     // Checking if a user with the same username already exists
     const userExist = await userModel.findOne({ userName });
@@ -21,8 +20,6 @@ export async function createUser(req, res) {
 
     // Creating a new user with the provided username, mobilenumber, and password
     const user = await userModel.create({
-      firstName,
-      lastName,
       userName,
       phoneNumber,
       password: hashedPassword,

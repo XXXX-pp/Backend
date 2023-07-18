@@ -30,10 +30,7 @@ app.get("/", (req, res) => {
 });
 
 app.use("/user", authRoutes)
-
-// app.get("/users");
-// app.post("/signup");
-// app.post("/login");
+app.use(userRoutes);
 
 app.use((req, res, next, err) => {
    res.locals.message = err.message;
