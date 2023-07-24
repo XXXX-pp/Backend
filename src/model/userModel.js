@@ -8,6 +8,15 @@ import {Schema, model } from 'mongoose'
     required:true,
     },
 
+    email: {
+      type: String,
+      required: true,
+    },
+  
+    Verified: {
+      type: Boolean,
+    },
+
     phoneNumber: {
     type:String,
     required:true,

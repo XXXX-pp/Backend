@@ -13,7 +13,7 @@ dotenv.config();
 connectDB();
 
 // PACKAGE INITIALIZATIONS
-const port = process.env.PORT;
+const port = process.env.PORT || 8000;
 const app = express();
 const server = http.createServer(app);
 app.use(authRoutes);
