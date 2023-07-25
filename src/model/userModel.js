@@ -3,7 +3,7 @@ import {Schema, model } from 'mongoose'
 // DATABASE SCHEMA AND MODEL
   const userSchema = new Schema({
 
-    userName: {
+    username: {
     type:String,
     required:true,
     },
@@ -15,11 +15,6 @@ import {Schema, model } from 'mongoose'
   
     Verified: {
       type: Boolean,
-    },
-
-    phoneNumber: {
-    type:String,
-    required:true,
     },
 
     password: {
