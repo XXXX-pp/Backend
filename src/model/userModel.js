@@ -1,19 +1,8 @@
 import { Schema, model } from 'mongoose'
-// import bcrypt from 'bcryptjs'
 
 // DATABASE SCHEMA AND MODEL
 const userSchema = new Schema({
-
-  firstName: {
-    type: String, required: true,
-    min: 4,
-    max: 25
-  },
-  lastName: {
-    type: String, required: true,
-    min: 4,
-    max: 25
-  },
+ 
   userName: {
     type: String,
     required: true,
@@ -29,14 +18,14 @@ const userSchema = new Schema({
     required: true,
   },
 
-  Verified: {
-    type: Boolean,
+  isVerified: {
+    type: Boolean, default:false
   },
 
   password: {
     type: String,
     required: true
   }
-})
+}, {timestamps:true})
 
-export const userModel = model("User", userSchema);
+export const UserModel = model("User", userSchema);

@@ -1,214 +1,166 @@
 import bcrypt from "bcryptjs";
-import { userModel } from "../model/userModel.js";
-import { UserOTPVerification } from "../model/userOTPVerifiaction.js"
-import nodemailer from "nodemailer";
+import jwt from "jsonwebtoken";
 
+import { UserModel } from "../model/userModel.js";
+import { otpMessage } from "../mail/otpMail.js";
+import { sendEmail } from "../mail/sendMail.js";
+import { OtpModel } from "../model/otpModel.js";
+import { issueOtp, verifyOtp } from "../utils/helpers/otp.js";
 
-// Nodemailer Implemention
-const transporter = nodemailer.createTransport({
-  service: 'gmail',
-  host: 'smtp.gmail.com',
-  port: 465,
-  secure: true,
-  auth: {
-    user: 'xxxcompany2.0@gmail.com',
-    pass: 'siviwmwobcwrbokl',
-  },
-})
+const JWT_SECRET = process.env.JWT_SECRET;
+const JWT_EXPIRE = process.env.JWT_EXPIRE;
 
-
-//testing success
-transporter.verify((error, success) => {
-  if (error) {
-    console.log(error)
-  }
-  else {
-    console.log("Ready for message")
-    console.log(success)
-  }
-})
-
-export async function createUser(req, res) {
+export const createUser = async (req, res) => {
   try {
     // Extracting the username, mobilenumber, and password from the request body
-    const { firstName, lastName, userName, phoneNumber, password, email } = req.body;
+    const { userName, phoneNumber, password, email } = req.body;
+    const userExists = await UserModel.findOne(
+      { $or: [{ email }, { userName }, { phoneNumber }] },
+      { email, userName, phoneNumber }
+    ).lean();
 
-    // Checking if a user with the same username already exists
-    const userExist = await userModel.findOne({ userName });
+    if (userExists) {
+      const emailExists = userExists.email === email;
+      const phoneNumberExists = userExists.phoneNumber === phoneNumber;
+      const userNameExists = userExists.userName === userName;
 
-    if (userExist) {
-      // If a user with the same username exists, send an error response
-      return res
-        .status(400)
-        .json({ success: false, message: "Username already exists" });
+      if (emailExists)
+        return res.status(409).json({
+          success: false,
+          message: "email already registered with an existing account",
+          data: null,
+        });
+      if (phoneNumberExists)
+        return res.status(409).json({
+          success: false,
+          message: "phone number already registered with an existing account",
+          data: null,
+        });
+      if (userNameExists)
+        return res.status(409).json({
+          success: false,
+          message: "username already registered with an existing account",
+          data: null,
+        });
     }
-    const saltRounds = 12
+
+    const saltRounds = +proccess.env.SALT_WORKER;
     const hashedPassword = await bcrypt.hash(password, saltRounds);
 
     // Creating a new user with the provided username, mobilenumber, and password
-    const user = await userModel.create({
-
-      firstName,
-      lastName,
+    const user = await UserModel.create({
       email,
       userName,
       phoneNumber,
-      Verified: false,
       password: hashedPassword,
     });
 
-    await sendOTPVerification(user, res)
+    const otp = await issueOtp(email, user._id);
+    const html = otpMessage(otp.emailOtp, otp.timeLeft);
+    const subject = "Verify Your Email";
+    const to = user.email;
+    await sendEmail(html, subject, to);
 
     // If user creation is successful, send a JSON response with the user's information
-    // return res.status(201).json({
-    //   success: true,
-    //   message: `user created successfully`,
-    //   data: user,
-    // });
-
+    return res.status(201).json({
+      success: true,
+      message: `user created successfully`,
+      data: user,
+    });
   } catch (error) {
     console.log(error);
     return res.status(500).json({ message: `internal server error` });
-  }
-}
-
-
-
-//send OTP verification email
-const sendOTPVerification = async ({ _id, email }, res) => {
-  try {
-    const otp = `${Math.floor(1000 + Math.random() * 9000)}`;
-
-    // mailOptions
-    const mailOptions = {
-      from: 'xxxcompany2.0@gmail.com',
-      to: email,
-      subject: 'Verify Your Email',
-      html: `<p>Enter ${otp} </br> in the app to verify your email address and complete the signup process
-      <p>This code <b>expires in 1 hour.</b></p>
-    </p>`,
-    };
-
-    const saltRounds = 10;
-    const hashedOTP = await bcrypt.hash(otp, saltRounds);
-
-    const newOTPVerification = new UserOTPVerification({
-      userId: _id,
-      otp: hashedOTP,
-      createdAt: Date.now(),
-      expiresAt: Date.now() + 3600000,
-    });
-
-    await newOTPVerification.save();
-    await transporter.sendMail(mailOptions);
-
-    return res.json({
-      status: 'PENDING',
-      message: 'Verification OTP email sent',
-      data: {
-        userId: _id,
-        email,
-      },
-    });
-  } catch (error) {
-    console.error(error);
-    return res.status(500).json({ status: 'FAILED', message: 'An error occurred' });
   }
 };
 
-
-
-export async function verifyOTP(req, res) {
+export async function handleLogin(req, res) {
+  const { userName, password } = req.body;
   try {
-    let { userId, otp } = req.body
-    if (!userId || !otp) {
-      throw Error("Empty otp details are not allowed")
+    // Checking if a user with the same username already exists
+    const user = await UserModel.findOne({ userName });
+    const passwordMatch = await bcrypt.compare(password, user.password);
+
+    if (!user)
+      return res
+        .status(400)
+        .json({ success: false, message: "user not found", data: null });
+    if (!passwordMatch) {
+      return res
+        .status(400)
+        .json({ success: false, message: "invalid cridentials", data: null });
     }
-    else {
-      const userOTPVerifiactionRecords = await UserOTPVerification.find({ userId })
-
-      if (userOTPVerifiactionRecords.length <= 0) {
-        throw new Error("Account record dosen't exist or has already been verified already. Please sign up or log in.")
-      } else {
-
-        const { expiresAt } = userOTPVerifiactionRecords[0];
-        const hashedOTP = userOTPVerifiactionRecords[0].otp;
-
-        if (expiresAt < Date.now()) {
-          await UserOTPVerification.deleteMany({ userId })
-          throw new Error("Code has expired. Please request again")
-        } else {
-          const validOTP = await bcrypt.compare(otp, hashedOTP)
-
-          if (!validOTP) {
-            throw new Error("Invalid code passed. Check your inbox.")
-          }
-          else {
-            await userModel.updateOne({ _id: userId }, { Verified: true });
-
-            await UserOTPVerification.deleteMany({ userId });
-
-            res.json({
-              status: "Verified",
-              message: 'User email verified successfully.'
-            })
-          }
-        }
-      }
-    }
-  } catch (error) {
-    res.json({
-      status: "FAILED",
-      message: error.message
-    })
-  }
-}
-
-
-
-
-export async function resendOTPVerificationCode(req, res) {
-  try {
-    let { userId, email} = req.body
-
-    if (!userId || !email) {
-      throw Error("Empty otp details are not allowed")
-    } else {
-      await UserOTPVerification.deleteMany({ userId });
-      sendOTPVerification({ _id: userId, email }, res)
-    }
-  } catch (error) {
-    res.json({
-      status: "FAILED",
-      message: error.message
-    })
-  }
-}
-
-
-
-
-export async function handleLogIn(req, res) {
-  const { username, password } = req.body;
-
-  // Checking if a user with the same username already exists
-  const user = await userModel.findOne({ userName });
-  const passwordMatch = await bcrypt.compare(password, user.password)
-
-  if (user && passwordMatch) {
-    res.json({
-      _id: user._id,
-      userName: user.userName,
-      phoneNumber: user.phoneNumber,
+    const token = jwt.sign(user, JWT_SECRET, { expiresIn: JWT_EXPIRE });
+    return res.status(200).json({
+      success: true,
+      message: `user login successfully`,
+      data: user,
+      token,
     });
-  }
-  else{
-    throw new Error('Passwords do not match')
-  }
-
-}catch(error){
-    // If user login fails, send an error response
+  } catch (error) {
     console.log(error);
     return res.status(500).json({ message: `internal server error` });
   }
 }
+
+export const sendUserOtp = async (req, res) => {
+  try {
+    const { userId, email } = req.body;
+    if (!userId || !email) {
+      throw Error("Empty otp details are not allowed");
+    };
+
+    const otp = await issueOtp(userId, email);
+    const html = otpMessage(otp.emailOtp, otp.timeLeft);
+    const subject = "OTP Authorization";
+    const to = user.email;
+    await sendEmail(html, subject, to);
+    res.status(200).json({
+      status: true,
+      message: "otp sent successfully",
+      data: null
+    });
+  } catch (error) {
+    return res.status(500).json({
+      status: false,
+      message: `internal server error`,
+    });
+  }
+};
+
+export const verifyUserOtp = async (req, res) => {
+  try {
+    const { userId, email, otp } = req.body;
+    if (!userId || !otp) {
+      throw Error("Empty otp details are not allowed");
+    }
+
+    const validOtp = await verifyOtp(userId, email, otp);
+    if (!validOtp)
+      return {
+        success: false,
+        message: "otp expired or incorrect",
+        data: null,
+      };
+
+    const user = await UserModel.updateOne(
+      { _id: userId },
+      { isVerified: true },
+      { new: true }
+    );
+
+    await OtpModel.deleteMany({ userId });
+    const token = jwt.sign(user, JWT_SECRET, { expiresIn: JWT_EXPIRE });
+
+    res.status(200).json({
+      status: true,
+      message: "user verified successfully",
+      data: user,
+      token,
+    });
+  } catch (error) {
+    return res.status(500).json({
+      status: false,
+      message: `internal server error`,
+    });
+  }
+};
