@@ -8,6 +8,7 @@ import dotenv from "dotenv";
 import connectDB from "./config/db.js";
 import authRoutes from "./routes/authRoutes.js";
 import userRoutes from "./routes/userRoutes.js";
+import bodyParser from "body-parser";
 
 dotenv.config();
 connectDB();
@@ -16,13 +17,14 @@ connectDB();
 const port = process.env.PORT || 8000;
 const app = express();
 const server = http.createServer(app);
-app.use(authRoutes);
-app.use(userRoutes);
 app.use(cors());
 app.use(morgan("dev"));
 app.use(express.json());
 app.use(cookieParser());
 app.use(express.urlencoded({ extended: true }));
+app.use(authRoutes);
+app.use(userRoutes);
+
 
 // API ENDPOINTS
 app.get("/", (req, res) => {
