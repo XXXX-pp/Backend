@@ -43,23 +43,38 @@ import dotenv from "dotenv";
 
 dotenv.config();
 
-const forMailUser = process.env.GMAIL_USER;
-const forMailPass = process.env.GMAIL_PASS;
-const fromUser = process.env.FROM;
+
+const authUser = process.env.GOOGLE_AUTH_USER;
+const authPass = process.env.GOOGLE_AUTH_PASS;
+const compMail = process.env.COMP_MAIL;
+const mailSubject = process.env.SUBJECT
+
+
 const transport = nodemailer.createTransport({
   service: "gmail",
+  host: "smtp.gmail.com",
+  port: 465,
+  secure: true,
   auth: {
-    user: forMailUser,
-    pass: forMailPass,
+    user: authUser,
+    pass: authPass,
   },
   tls: {
     rejectUnauthorized: false,
   },
 });
 
-export const sendEmail = async (from, to, subject, html) => {
+export const sendEmail = async (email, message) => {
+
+  const mailOptions = {
+          from:compMail,
+          subject: mailSubject,
+          to:email,
+          html: message
+        };
+
   return new Promise((resolve, reject) => {
-    transport.sendMail({ from: fromUser, subject, to, html }, (err, info) => {
+    transport.sendMail(mailOptions, (err, info) => {
       if (err) reject(err);
       resolve(info);
     });

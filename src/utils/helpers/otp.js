@@ -1,8 +1,12 @@
 import bcrypt from "bcryptjs"
 import { OtpModel } from "../../model/otpModel.js";
+import { findOtp, findUser } from "../../workers/dbWork.js";
 
-export const issueOtp = async (email, userId) => {
-  const otp = random.int(100000, 1000000);
+export const issueOtp = async (userId, email) => {
+  const otp = `${Math.floor(1000 + Math.random() * 9000)}`;
+
+  const saltRounds = +process.env.SALT_WORKER;
+
   const hashedOTP = await bcrypt.hash(otp, saltRounds);
   await OtpModel.create({
     userId,
@@ -12,18 +16,16 @@ export const issueOtp = async (email, userId) => {
     expiresAt: Date.now() + 3600,
   });
   return {
-    emailOtp: otp.toString(),
+    userOtp: otp,
     timeLeft: `1 hour`,
   };
 };
 
-export const verifyOtp = async (userId, email, otp, keepAlive = false) => {
-  const user = await OtpModel.findOne(
-    { $or: [{ email }, { userId }] },
-    { email, userId }
-  ).lean();
-  const validOtp = await bcrypt.compare(otp, user.otp);
-  if (validOtp !== otp) return false;
+export const verifyOtp = async (otpId, email, otp, keepAlive = false) => {
+  const otpDetails= await findOtp(otpId,email)
+  if(!otpDetails){return false}
+  const validOtp = await bcrypt.compare(otp, otpDetails.otp);
+  if (!validOtp) return false;
   // To prevent the otp from being used twice, reset the otp.
   // if (!keepAlive) await issueOtp(email, userId);
   return true;

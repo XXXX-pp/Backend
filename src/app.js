@@ -5,8 +5,9 @@ import morgan from "morgan";
 import http from "http";
 import dotenv from "dotenv";
 import connectDB from "./config/db.js";
-import authRoutes from "./routes/authRoutes.js";
-import userRoutes from "./routes/userRoutes.js";
+import createUserRoute from "./routes/createUserRoute.js";
+import loginUserRoute from "./routes/loginUserRoute.js";
+import otpRoute from "./routes/otpRoutes.js";
 
 dotenv.config();
 connectDB();
@@ -15,8 +16,7 @@ connectDB();
 const port = process.env.PORT || 3000;
 const app = express();
 const server = http.createServer(app);
-app.use(authRoutes);
-app.use(userRoutes);
+
 app.use(cors());
 app.use(morgan("dev"));
 app.use(express.json());
@@ -28,11 +28,9 @@ app.get("/", (req, res) => {
   res.send("API SERVER IS RUNNING");
 });
 
-app.use("/user", authRoutes)
-
-// app.get("/users");
-// app.post("/signup");
-// app.post("/login");
+app.use("/user", createUserRoute,loginUserRoute)
+app.use(otpRoute)
+// app.use(userRoutes)
 
 app.use((req, res, next, err) => {
    res.locals.message = err.message;

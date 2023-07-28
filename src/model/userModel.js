@@ -3,12 +3,12 @@ import { Schema, model } from 'mongoose'
 // DATABASE SCHEMA AND MODEL
 const userSchema = new Schema({
  
-  userName: {
+  username: {
     type: String,
     required: true,
   },
 
-  phoneNumber: {
+  phonenumber: {
     type: String,
     required: true,
   },
