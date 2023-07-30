@@ -2,6 +2,17 @@ import { UserModel } from "../model/userModel.js";
 import { OtpModel } from "../model/otpModel.js";
 
 
+
+export const saveUser = async(username,email,phonenumber,hashedPassword)=>{
+    const user = await UserModel.create({
+        email,
+        username,
+        phonenumber,
+        password: hashedPassword,
+    });
+    return user
+}
+
 export const findUser = async(username,email,phonenumber,userId) =>{
     const user = await UserModel.findOne(
         { $or: [{ email }, { username }, { phonenumber },{ userId }] }
@@ -9,20 +20,35 @@ export const findUser = async(username,email,phonenumber,userId) =>{
     return user
 }
 
-export const findOtp = async(otpId,email) =>{
+export const updateUserStatus = async(userId)=>{
+    const user = await UserModel.updateOne(
+        { _id: userId },
+        { isVerified: true },
+        { new: true }
+    );
+    return user
+}
+
+export const saveOtp = async(userId,email,hashedOTP)=>{
+    await OtpModel.create({
+        userId,
+        email,
+        otp: hashedOTP,
+        createdAt: Date.now(),
+        expiresAt: Date.now() + 3600,
+    });
+}
+
+export const findOtp = async(userId,email) =>{
     const userOtp = await OtpModel.findOne(
-        { $or: [{ email },{otpId}] }
+        { $or: [{ email },{userId}] }
     ).lean();
     return userOtp
 }
-
-
-export const saveUser = async(username,email,phonenumber,hashedPassword)=>{
-    await UserModel.create({
-        email,
-        username,
-        phonenumber,
-        password: hashedPassword,
-    });
+export const deleteOtp = async(email)=>{
+    await OtpModel.deleteOne({ email })
 }
+
+
+
 

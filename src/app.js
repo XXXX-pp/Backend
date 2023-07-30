@@ -8,8 +8,12 @@ import connectDB from "./config/db.js";
 import createUserRoute from "./routes/createUserRoute.js";
 import loginUserRoute from "./routes/loginUserRoute.js";
 import otpRoute from "./routes/otpRoutes.js";
+import uploadRoute from "./routes/uploadFileRoute.js";
+
+
 
 dotenv.config();
+
 connectDB();
 
 
@@ -30,6 +34,8 @@ app.get("/", (req, res) => {
 
 app.use("/user", createUserRoute,loginUserRoute)
 app.use(otpRoute)
+app.use(uploadRoute)
+
 // app.use(userRoutes)
 
 app.use((req, res, next, err) => {
