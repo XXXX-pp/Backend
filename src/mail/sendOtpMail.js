@@ -1,7 +1,4 @@
-import dotenv from "dotenv";
 import { transport } from "../config/nodemailerConfig.js";
-
-dotenv.config();
 
 const companyMail = process.env.COMPANY_MAIL;
 const mailSubject = process.env.SUBJECT

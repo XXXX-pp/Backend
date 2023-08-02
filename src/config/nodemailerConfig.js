@@ -1,7 +1,4 @@
 import nodemailer from "nodemailer";
-import dotenv from "dotenv";
-
-dotenv.config();
 
 const authUser = process.env.GOOGLE_AUTH_USER;
 const authPass = process.env.GOOGLE_AUTH_PASS;

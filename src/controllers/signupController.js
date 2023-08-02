@@ -1,6 +1,5 @@
 import bcrypt from "bcryptjs";
 import { findUser, saveUser} from "../workers/dbWork.js"
-import { UserModel } from "../model/userModel.js";
 import { sendUserOtp }from "./otpController.js";
 
 export const createUser = async (req, res) => {

@@ -1,8 +1,6 @@
 import { UserModel } from "../model/userModel.js";
 import { OtpModel } from "../model/otpModel.js";
 
-
-
 export const saveUser = async(username,email,phonenumber,hashedPassword)=>{
     const user = await UserModel.create({
         email,

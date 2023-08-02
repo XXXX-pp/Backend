@@ -26,9 +26,6 @@ app.use(morgan("dev"));
 app.use(express.json());
 app.use(cookieParser());
 app.use(express.urlencoded({ extended: true }));
-app.use(authRoutes);
-app.use(userRoutes);
-
 
 // API ENDPOINTS
 app.get("/", (req, res) => {
