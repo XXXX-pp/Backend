@@ -1,8 +1,8 @@
-import { otpMessage } from "../mail/otpEmailMessage.js";
-import { sendEmail } from "../mail/sendOtpMail.js";
-import { issueOtp, verifyOtp } from "../workers/otpWork.js";
-import { updateUserStatus,deleteOtp } from "../workers/dbWork.js";
-import { generateJwtToken } from "../utils/utilities.js";
+import { otpMessage } from "../../mail/otpEmailMessage.js";
+import { sendEmail } from "../../mail/sendOtpMail.js";
+import { issueOtp, verifyOtp } from "../../workers/otpWork.js";
+import { updateUserStatus,deleteOtp } from "../../workers/dbWork.js";
+import { generateJwtToken } from "../../utils/utilities.js";
 
 //send otp to user email
 export const sendUserOtp = async (userId,email) => {
@@ -27,7 +27,8 @@ export const sendUserOtp = async (userId,email) => {
       data: null
     });
   } catch (error) {
-    return res.status(500).json({
+    console.log(error);
+    return ({
       status: false,
       message: `internal server error`,
     });

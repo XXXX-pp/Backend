@@ -1,12 +1,13 @@
 import bcrypt from "bcryptjs";
-import { findUser, saveUser} from "../workers/dbWork.js"
+import { findUser, saveUser} from "../../workers/dbWork.js"
 import { sendUserOtp }from "./otpController.js";
 
 export const createUser = async (req, res) => {
   try {
-    const { username, phonenumber, password, email } = req.body;
+    const { username, password, email } = req.body;
+    const {posts,postsYouLiked,postsYouSaved}=[] 
     //check if user already exists
-    const userExists = await findUser(username,phonenumber,email)
+    const userExists = await findUser(username,email)
   
     if (userExists) {
       return res.status(409).json({
@@ -22,7 +23,7 @@ export const createUser = async (req, res) => {
 
     //if user does not exist create an unverified new user
     if (!userExists){
-      const user = await saveUser(username,email,phonenumber,hashedPassword)
+      const user = await saveUser(username.toLowerCase(),email,hashedPassword,posts,postsYouLiked,postsYouSaved)
       
       //send an otp after user creation
       const otpStatus = await sendUserOtp(user._id,email)
