@@ -1,4 +1,7 @@
 import nodemailer from "nodemailer";
+import dotenv from "dotenv";
+
+dotenv.config();
 
 const authUser = process.env.GOOGLE_AUTH_USER;
 const authPass = process.env.GOOGLE_AUTH_PASS;
@@ -10,7 +13,7 @@ export const transport = nodemailer.createTransport({
   secure: true,
   auth: {
     user: authUser,
-    pass: authPass,
+    pass: authPass
   },
   tls: {
     rejectUnauthorized: false,

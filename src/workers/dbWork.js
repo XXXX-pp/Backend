@@ -1,19 +1,22 @@
 import { UserModel } from "../model/userModel.js";
 import { OtpModel } from "../model/otpModel.js";
+import { PostModel } from "../model/postModel.js";
 
-export const saveUser = async(username,email,phonenumber,hashedPassword)=>{
+export const saveUser = async(username,email,hashedPassword,posts,postYouLiked,postsYouSaved)=>{
     const user = await UserModel.create({
         email,
         username,
-        phonenumber,
         password: hashedPassword,
+        posts,
+        postYouLiked,
+        postsYouSaved,
     });
     return user
 }
 
-export const findUser = async(username,email,phonenumber,userId) =>{
+export const findUser = async(username,email,userId) =>{
     const user = await UserModel.findOne(
-        { $or: [{ email }, { username }, { phonenumber },{ userId }] }
+        { $or: [{ email }, { username },{ userId }] }
     ).lean();
     return user
 }
@@ -25,6 +28,15 @@ export const updateUserStatus = async(userId)=>{
         { new: true }
     );
     return user
+}
+
+export const updateUserPosts = async(user,postId)=>{
+    const userPostStatus = await UserModel.updateOne(
+        { username: user },
+        { $push: {posts: postId} },
+        { new: true }
+    );
+    return userPostStatus
 }
 
 export const saveOtp = async(userId,email,hashedOTP)=>{
@@ -45,6 +57,18 @@ export const findOtp = async(userId,email) =>{
 }
 export const deleteOtp = async(email)=>{
     await OtpModel.deleteOne({ email })
+}
+
+export const createNewPost = async(user, description,firstImageLink,secondImageLink,likes,postId) => {
+    const post = await PostModel.create({
+        user,
+        description,
+        firstImageLink,
+        secondImageLink,
+        likes,
+        postId
+    });
+    return post
 }
 
 

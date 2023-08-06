@@ -1,15 +1,15 @@
 import bcrypt from "bcryptjs";
-import { findUser } from "../workers/dbWork.js"
-import { generateJwtToken } from "../utils/utilities.js";
+import { findUser } from "../../workers/dbWork.js"
+import { generateJwtToken } from "../../utils/utilities.js";
 
 
 //controller to login user
 export async function loginUser(req, res) {
-  const { username, password } = req.body;
+  const { username,email, password } = req.body;
 
   try {
     //check if the user exists
-    const user = await findUser(username)
+    const user = await findUser(username.toLowerCase(),email)
     
     if (!user){
       return res
