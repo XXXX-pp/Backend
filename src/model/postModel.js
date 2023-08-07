@@ -10,12 +10,12 @@ const postSchema = new Schema({
     type: String,
     required: true,
   },
-  firstImageLink:{
-    type: String,
+  firstImage:{
+    type: Object,
     required: true,
   },
-  secondImageLink:{
-    type: String,
+  secondImage:{
+    type: Object,
     required: true,
   },
   likes:{

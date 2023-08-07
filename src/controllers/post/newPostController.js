@@ -16,10 +16,18 @@ export const createPost = async (req, res) => {
     }
 
     const {user,description} = req.body
-    const firstImageLink=uploadStatus[0].url
-    const secondImageLink=uploadStatus[1].url
+    const firstImage={
+      src:uploadStatus[0].url,
+      likes:'200',
+      likedBy:[]
+    }
+    const secondImage={
+      src:uploadStatus[1].url,
+      likes:'200',
+      likedBy:[]
+    }
     
-    const newPostStatus = await createNewPost(user.toLowerCase(),description,firstImageLink,secondImageLink,'1000',generateUUID)
+    const newPostStatus = await createNewPost(user.toLowerCase(),description,firstImage,secondImage,'1000',generateUUID)
     
     await updateUserPosts(user.toLowerCase(),newPostStatus.postId)
     
