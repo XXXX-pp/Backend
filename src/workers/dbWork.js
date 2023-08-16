@@ -14,9 +14,9 @@ export const saveUser = async(username,email,hashedPassword,posts,postYouLiked,p
     return user
 }
 
-export const findUser = async(username,email,userId) =>{
+export const findUser = async(username,email) =>{
     const user = await UserModel.findOne(
-        { $or: [{ email }, { username },{ userId }] }
+        { $or: [{ username:username },{ email:email }] }
     ).lean();
     return user
 }
@@ -51,7 +51,7 @@ export const saveOtp = async(userId,email,hashedOTP)=>{
 
 export const findOtp = async(userId,email) =>{
     const userOtp = await OtpModel.findOne(
-        { $or: [{ email },{userId}] }
+        { $and: [{ email },{userId}] }
     ).lean();
     return userOtp
 }

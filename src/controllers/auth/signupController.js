@@ -6,6 +6,7 @@ export const createUser = async (req, res) => {
   try {
     const { username, password, email } = req.body;
     const {posts,postsYouLiked,postsYouSaved}=[] 
+
     //check if user already exists
     const userExists = await findUser(username,email)
   

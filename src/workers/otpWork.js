@@ -15,6 +15,7 @@ export const issueOtp = async (userId, email) => {
 
 export const verifyOtp = async (userId, email, otp, keepAlive = false) => {
   const otpDetails= await findOtp(userId,email)
+  console.log(otpDetails)
   if(!otpDetails){return false}
   const validOtp = await bcrypt.compare(otp, otpDetails.otp);
   if (!validOtp) return false;
