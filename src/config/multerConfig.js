@@ -9,7 +9,7 @@ const storage = multer.diskStorage({
       cb(null, uniqueSuffix +'-'+file.originalname)
     },
     fileFilter: (req, file, cb)=>{
-      let ext = path.extname(file.originalname);
+      let ext = path.extname(file.originalname)
       if(ext == '.png' && ext == '.jpg' && ext == '.jpeg' && ext == '.gif'){
         return cb(null, true);
       }

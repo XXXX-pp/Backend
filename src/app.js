@@ -5,11 +5,11 @@ import morgan from "morgan";
 import http from "http";
 import dotenv from "dotenv";
 import connectDB from "./config/db.js";
-import createUserRoute from "./routes/createUserRoute.js";
-import loginUserRoute from "./routes/loginUserRoute.js";
-import otpRoute from "./routes/otpRoutes.js";
-import uploadRoute from "./routes/uploadFileRoute.js";
 
+import createUserRoute from "./routes/auth/createUserRoute.js";
+import loginUserRoute from "./routes/auth/loginUserRoute.js";
+import otpRoute from "./routes/auth/otpRoutes.js";
+import newPostRoute from "./routes/post/newPostRoute.js";
 
 
 dotenv.config();
@@ -17,7 +17,7 @@ dotenv.config();
 connectDB();
 
 
-const port = process.env.PORT || 3000;
+const port = process.env.PORT 
 const app = express();
 const server = http.createServer(app);
 
@@ -34,9 +34,8 @@ app.get("/", (req, res) => {
 
 app.use("/user", createUserRoute,loginUserRoute)
 app.use(otpRoute)
-app.use(uploadRoute)
+app.use(newPostRoute)
 
-// app.use(userRoutes)
 
 app.use((req, res, next, err) => {
    res.locals.message = err.message;
