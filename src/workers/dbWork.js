@@ -39,10 +39,12 @@ export const updateUserPosts = async(user,postId)=>{
     return userPostStatus
 }
 
-export const saveOtp = async(userId,email,hashedOTP)=>{
+export const saveOtp = async(userId,email,hashedOTP,username,hashedPassword)=>{
     await OtpModel.create({
         userId,
         email,
+        username,
+        password: hashedPassword,
         otp: hashedOTP,
         createdAt: Date.now(),
         expiresAt: Date.now() + 3600,

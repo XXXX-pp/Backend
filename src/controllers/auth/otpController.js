@@ -5,9 +5,9 @@ import { updateUserStatus,deleteOtp } from "../../workers/dbWork.js";
 import { generateJwtToken } from "../../utils/utilities.js";
 
 //send otp to user email
-export const sendUserOtp = async (userId,email) => {
+export const sendUserOtp = async (userId,email,username,password) => {
   try {
-    if (!userId || !email) {
+    if (!userId || !email || !username || !password) {
       return ({
         status: false,
         message: `User details not found`,
@@ -15,9 +15,8 @@ export const sendUserOtp = async (userId,email) => {
     };
     
     //generate a new otp
-    const otp = await issueOtp(userId, email);
+    const otp = await issueOtp(userId, email, username, password);
     const message = otpMessage(otp.userOtp, otp.timeLeft);
-
     //send mail with otp details
     await sendEmail(email,message);
     
@@ -27,7 +26,6 @@ export const sendUserOtp = async (userId,email) => {
       data: null
     });
   } catch (error) {
-    console.log(error);
     return ({
       status: false,
       message: `internal server error`,
