@@ -10,6 +10,7 @@ import createUserRoute from "./routes/auth/createUserRoute.js";
 import loginUserRoute from "./routes/auth/loginUserRoute.js";
 import otpRoute from "./routes/auth/otpRoutes.js";
 import newPostRoute from "./routes/post/newPostRoute.js";
+import checkDetailsRoute from "./routes/auth/checkDetailsRoute.js"
 
 
 dotenv.config();
@@ -32,7 +33,7 @@ app.get("/", (req, res) => {
   res.send("API SERVER IS RUNNING");
 });
 
-app.use("/user", createUserRoute,loginUserRoute)
+app.use("/user", createUserRoute,loginUserRoute,checkDetailsRoute)
 app.use(otpRoute)
 app.use(newPostRoute)
 

@@ -8,15 +8,16 @@ export const createUser = async (req, res) => {
     const {posts,postsYouLiked,postsYouSaved}=[] 
 
     //check if user already exists
+    // if (userExists) {
+    //   return res.json({
+    //     success: false,
+    //     status: 409,
+    //     message: "User with details already exists",
+    //     data: null,
+    //   });
+    // }
+
     const userExists = await findUser(username,email)
-  
-    if (userExists) {
-      return res.status(409).json({
-        success: false,
-        message: "User with details already exists",
-        data: null,
-      });
-    }
     
     //encrypt user password
     const saltRounds = +process.env.SALT_WORKER;
@@ -27,18 +28,20 @@ export const createUser = async (req, res) => {
       const user = await saveUser(username.toLowerCase(),email,hashedPassword,posts,postsYouLiked,postsYouSaved)
       
       //send an otp after user creation
-      const otpStatus = await sendUserOtp(user._id,email)
+      const otpStatus = await sendUserOtp(user._id,email,username,password)
       
       //if user is created and otp is sent, send a JSON response
-      if(otpStatus) return res.status(201).json({
-        success: true,
-        message: `user created successfully`,
-        data: user,
-        otpStatus:otpStatus
+      if(otpStatus.status === false) return res.json({
+        status: 400,
+        message: 'Oops there was an error, OTP could not be sent'
+      });
+      if(otpStatus.status === true) return res.json({
+        status: 201,
+        message: 'OTP sent successfully'
       });
     };
   } catch (error) {
     console.log(error);
-    return res.status(500).json({ message:`internal server error` });
+    return res.json({ status: 500, message: 'Internal Server Error, please try again later'});
   }
 };
