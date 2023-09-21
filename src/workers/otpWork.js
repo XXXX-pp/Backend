@@ -14,11 +14,11 @@ export const issueOtp = async (userId, email, username, password) => {
   };
 };
 
-export const verifyOtp = async (userId, email, otp, keepAlive = false) => {
-  const otpDetails= await findOtp(userId,email)
-  console.log(otpDetails)
+export const verifyOtp = async (email, otp, userId, keepAlive = false) => {
+  const otpDetails= await findOtp(email)
   if(!otpDetails){return false}
-  const validOtp = await bcrypt.compare(otp, otpDetails.otp);
+  const OTP = await otp
+  const validOtp = await bcrypt.compare(OTP, otpDetails.otp)
   if (!validOtp) return false;
   // To prevent the otp from being used twice, reset the otp.
   // if (!keepAlive) await issueOtp(email, userId);
