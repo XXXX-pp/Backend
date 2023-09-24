@@ -22,11 +22,18 @@ const port = process.env.PORT
 const app = express();
 const server = http.createServer(app);
 
-app.use(cors());
+const corsOptions = {
+  origin: 'http://localhost:3000',
+  methods: 'POST, PATCH, OPTIONS', // The allowed HTTP methods
+  credentials: true, // Allow cookies and authentication headers
+};
+
+app.use(cors(corsOptions));
 app.use(morgan("dev"));
 app.use(express.json());
-app.use(cookieParser());
 app.use(express.urlencoded({ extended: true }));
+app.use(cookieParser());
+
 
 // API ENDPOINTS
 app.get("/", (req, res) => {
