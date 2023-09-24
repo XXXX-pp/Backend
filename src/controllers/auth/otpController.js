@@ -49,18 +49,20 @@ export const verifyUserOtp = async (req, res) => {
       message: "Otp incorrect",
       })
     )}
-    
     // update user status if otp is valid
     const user = await updateUserStatus(userId)  
     await deleteOtp(email)
-    //send jwt token togin user if otp is valid
+    //send jwt token inside a cookie to user if otp is valid
     const token = await generateJwtToken(user)
-    res.status(200).json({
+    res.cookie('XXX', token, {maxAge: 9000, httpOnly: false })
+    res.json({
       status: true,
       data: user,
-      token,
+      token
     });
   } catch (error) {
+    console.log(error)
+    // delete user from database
     return res.status(500).json({status: false});
   }
 };
