@@ -54,12 +54,12 @@ export const verifyUserOtp = async (req, res) => {
     await deleteOtp(email)
     //send jwt token inside a cookie to user if otp is valid
     const token = await generateJwtToken(user)
-    res.cookie('XXX', token, {maxAge: 9000, httpOnly: false })
-    res.json({
+    res.json({})
+    res.cookie('XXX', token, {maxAge: 9000, httpOnly: true }).json({
       status: true,
-      data: user,
+      data: userId,
       token
-    });
+    })
   } catch (error) {
     console.log(error)
     // delete user from database
