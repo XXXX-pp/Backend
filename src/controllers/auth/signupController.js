@@ -21,10 +21,17 @@ export const createUser = async (req, res) => {
       const otpStatus = await sendUserOtp(user._id,email,username,password)
       
       //if user is created and otp is sent, send a JSON response
-      if(otpStatus.status === false) return res.json({ status: 400});
-      if(otpStatus.status === true) return res.json({ status: 201, user: user});
+      if(otpStatus.status === false) return res.json({
+        status: 400,
+      });
+      if(otpStatus.status === true) return res.json({
+        status: 201,
+        userId: user._id,
+        email: user.email
+      });
     };
   } catch (error) {
+    console.log(error);
     return res.json({ status: 500});
   }
 };
