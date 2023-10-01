@@ -33,15 +33,15 @@ export const createUser = async (req, res) => {
       //if user is created and otp is sent, send a JSON response
       if(otpStatus.status === false) return res.json({
         status: 400,
-        message: 'Oops there was an error, OTP could not be sent'
       });
       if(otpStatus.status === true) return res.json({
         status: 201,
-        message: 'OTP sent successfully'
+        userId: user._id,
+        email: user.email
       });
     };
   } catch (error) {
     console.log(error);
-    return res.json({ status: 500, message: 'Internal Server Error, please try again later'});
+    return res.json({ status: 500});
   }
 };
