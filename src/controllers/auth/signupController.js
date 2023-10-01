@@ -7,16 +7,6 @@ export const createUser = async (req, res) => {
     const { username, password, email } = req.body;
     const {posts,postsYouLiked,postsYouSaved}=[] 
 
-    //check if user already exists
-    // if (userExists) {
-    //   return res.json({
-    //     success: false,
-    //     status: 409,
-    //     message: "User with details already exists",
-    //     data: null,
-    //   });
-    // }
-
     const userExists = await findUser(username,email)
     
     //encrypt user password
