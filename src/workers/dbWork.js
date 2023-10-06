@@ -21,14 +21,15 @@ export const findUser = async(username,email) =>{
     return user
 }
 
-export const updateUserStatus = async(userId)=>{
-    const user = await UserModel.updateOne(
-        { _id: userId },
-        { isVerified: true },
-        { new: true }
-    );
-    return user
-}
+export const updateUserStatus = async (userId) => {
+    const user = await UserModel.findByIdAndUpdate(
+      userId,
+      { isVerified: true },
+      { new: true }
+    ).select('email _id username');
+  
+    return user;
+  };
 
 export const updateUserPosts = async(user,postId)=>{
     const userPostStatus = await UserModel.updateOne(
