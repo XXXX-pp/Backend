@@ -27,6 +27,7 @@ app.use(cors({
   methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
   credentials: true,
 }));
+
 app.use(morgan("dev"));
 app.use(express.json({ limit: '10mb' }));
 app.use(cookieParser());

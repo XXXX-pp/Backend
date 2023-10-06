@@ -37,12 +37,11 @@ export const sendUserOtp = async (userId,email,username,password) => {
 //verify otp details
 export const verifyUserOtp = async (req, res) => {
   try {
-    const { userId, email, otp } = req.body;
-    if (!userId || !otp) {
+    const {email, otp, userId} = req.body
+    if (!email || !otp || !userId) {
       throw Error("Empty otp details are not allowed");
     }
-
-    const validOtp = await verifyOtp(userId, email, otp);
+    const validOtp = await verifyOtp(email, otp, userId);
     
     if (!validOtp){
     return(
@@ -55,20 +54,15 @@ export const verifyUserOtp = async (req, res) => {
     //update user status if otp is valid
     const user = await updateUserStatus(userId) 
     await deleteOtp(email)
-    
-    //send jwt token togin user if otp is valid
     const token = await generateJwtToken(user)
-    res.status(200).json({
+    res.json({
       status: true,
-      message: "user verified successfully",
-      data: user,
-      token,
-    });
+      data: userId,
+      token
+    })
   } catch (error) {
-    console.log(error);
-    return res.status(500).json({
-      status: false,
-      message: `internal server error`,
-    });
+    console.log(error)
+    // delete user from database
+    return res.status(500).json({status: false});
   }
 };

@@ -52,11 +52,9 @@ export const saveOtp = async(userId,email,hashedOTP,username,hashedPassword)=>{
     });
 }
 
-export const findOtp = async(userId,email) =>{
-    const userOtp = await OtpModel.findOne(
-        { $and: [{ email },{userId}] }
-    ).lean();
-    return userOtp
+export const findOtp = async(email) =>{
+    const otpHolder = await OtpModel.findOne({ email: email })
+    return otpHolder
 }
 export const deleteOtp = async(email)=>{
     await OtpModel.deleteOne({ email })
