@@ -41,7 +41,7 @@ export const verifyUserOtp = async (req, res) => {
     if (!email || !otp || !userId) {
       throw Error("Empty otp details are not allowed");
     }
-    const validOtp = await verifyOtp(email, otp, userId);
+    const validOtp = await verifyOtp(email, otp);
     
     if (!validOtp){
     return(
@@ -57,7 +57,7 @@ export const verifyUserOtp = async (req, res) => {
     const token = await generateJwtToken(user)
     res.json({
       status: true,
-      data: userId,
+      data: user,
       token
     })
   } catch (error) {
