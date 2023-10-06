@@ -3,6 +3,7 @@ import { sendEmail } from "../../mail/sendOtpMail.js";
 import { issueOtp, verifyOtp } from "../../workers/otpWork.js";
 import { updateUserStatus,deleteOtp } from "../../workers/dbWork.js";
 import { generateJwtToken } from "../../utils/utilities.js";
+import jwt from "jsonwebtoken";
 
 //send otp to user email
 export const sendUserOtp = async (userId,email,username,password) => {
@@ -49,8 +50,9 @@ export const verifyUserOtp = async (req, res) => {
       message: "Otp incorrect",
       })
     )}
-    // update user status if otp is valid
-    const user = await updateUserStatus(userId)  
+    
+    //update user status if otp is valid
+    const user = await updateUserStatus(userId) 
     await deleteOtp(email)
     const token = await generateJwtToken(user)
     res.json({
