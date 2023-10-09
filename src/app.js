@@ -12,6 +12,7 @@ import loginUserRoute from "./routes/auth/loginUserRoute.js";
 import otpRoute from "./routes/auth/otpRoutes.js";
 import newPostRoute from "./routes/post/newPostRoute.js";
 import checkDetailsRoute from "./routes/auth/checkDetailsRoute.js"
+import getPostRoute from './routes/get/getPostRoute.js'
 
 
 dotenv.config();
@@ -43,6 +44,7 @@ app.get("/", (req, res) => {
 app.use("/user", createUserRoute,loginUserRoute,checkDetailsRoute)
 app.use(otpRoute)
 app.use(newPostRoute)
+app.use(getPostRoute)
 
 
 app.use((err, req, res, next) => {
