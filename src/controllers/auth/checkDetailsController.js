@@ -6,7 +6,11 @@ export const checkDetails = async (req, res) => {
     const detailExist = await findUser(username, email)
 
     if (detailExist) {
-        return res.json({status: 201})
+        return res.json({
+          status: 201,
+          message: "Username Already Exists",
+          emailMessage: "Email Already Exists"
+        })
     }
 
     if (!detailExist) {
@@ -14,6 +18,9 @@ export const checkDetails = async (req, res) => {
     }
   }
   catch (error) {
-    return res.json({status: 500})
+    return res.json({
+      status: 500,
+      message: "Internal Server Error"
+    })
   }
 };

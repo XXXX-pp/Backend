@@ -12,14 +12,14 @@ export async function loginUser(req, res) {
     const user = await findUser(username.toLowerCase(),email)
     
     if (!user){
-      return res.json({ success: false, data: null, status: 404 });
+      return res.json({ success: false, data: null, status: 404 , message: 'User does not exist!' });
     }
 
     //if user exists verify the user password
     const passwordMatch = await bcrypt.compare(password, user.password);
     
     if (!passwordMatch) {
-      return res.json({ success: false,  data: null, status: 400 });
+      return res.json({ success: false,  data: null, status: 400, message: 'Invalid credentials' });
     }
     
     //if user password matches send jwt token to login user
