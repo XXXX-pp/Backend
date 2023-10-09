@@ -5,6 +5,7 @@ import morgan from "morgan";
 import http from "http";
 import dotenv from "dotenv";
 import connectDB from "./config/db.js";
+import bodyParser from "body-parser";
 
 import createUserRoute from "./routes/auth/createUserRoute.js";
 import loginUserRoute from "./routes/auth/loginUserRoute.js";
@@ -22,6 +23,7 @@ const port = process.env.PORT
 const app = express();
 const server = http.createServer(app);
 
+app.use(bodyParser.json())
 app.use(cors({
   origin: 'http://localhost:3000',
   methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',

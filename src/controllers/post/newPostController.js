@@ -5,11 +5,10 @@ import { Readable } from 'stream';
 import * as fs from "fs";
 
 export const createPost = async (req, res) => {
-  try {
+  try { 
     const requestData = req.body;
-    const user = requestData.username;
-    const description = requestData.description;
-
+    const user = requestData.username
+    const description = requestData.description
     if (requestData.mode === 'camera') {
       const imageObject = requestData.images || {};
       const imageKeys = Object.keys(imageObject);
@@ -81,51 +80,52 @@ export const createPost = async (req, res) => {
         },
         post: newPostStatus,
       });
-    } else if (requestData.mode === 'gallery') {
-      // Handle gallery mode here
-      // try {
-      //   const uploadStatus=[]
-  
-      //   for (let i = 0; i < req.files.length; i++) {
-      //     const path = req.files[i].path;
-      //     const originalname = req.files[i].originalname
-      //     const result = await cloudinary.uploader.upload(path, { public_id: originalname + Date.now() });
-      //     fs.unlink(path, (err) => {});
-      //     uploadStatus.push(result)
-      //   }
+    }  
+    if (requestData.mode === 'gallery') {
+      try {
+        const uploadStatus=[]
+        const user = req.body.username
+        const description = req.body.description
+        for (let i = 0; i < req.files.length; i++) {
+          const path = req.files[i].path;
+          const originalname = req.files[i].originalname
+          const publicId = `custom_unique_id_${Date.now()}`;
+          const result = await cloudinary.uploader.upload(path, { public_id: publicId + Date.now() });
+          fs.unlink(path, (err) => {});
+          uploadStatus.push(result)
+        }
     
-      //   const {user,description} = req.body
-      //   const firstImage={
-      //     src:uploadStatus[0].url,
-      //     likes:'200',
-      //     likedBy:[]
-      //   }
-      //   const secondImage={
-      //     src:uploadStatus[1].url,
-      //     likes:'200',
-      //     likedBy:[]
-      //   }
+        const firstImage={
+          src:uploadStatus[0].url,
+          likes:'200',
+          likedBy:[]
+        }
+        const secondImage={
+          src:uploadStatus[1].url,
+          likes:'200',
+          likedBy:[]
+        }
         
-      //   const newPostStatus = await createNewPost(user.toLowerCase(),description,firstImage,secondImage,'1000',generateUUID)
+        const newPostStatus = await createNewPost(user.toLowerCase(),description,firstImage,secondImage,'1000',generateUUID)
         
-      //   await updateUserPosts(user.toLowerCase(),newPostStatus.postId)
+        await updateUserPosts(user.toLowerCase(),newPostStatus.postId)
         
-      //   res.json({  
-      //     success: true,
-      //     data: {
-      //       uploadStatus1: uploadStatus[0].created_at,
-      //       uploadStatus2: uploadStatus[1].created_at,
-      //     }, 
-      //     post: newPostStatus
-      //   })
-      // }
-      // catch {
-      //   console.log(err);
-      //   res.status(500).json({
-      //     success: false,
-      //     error: err,
-      //   });
-      // }
+        res.json({  
+          success: true,
+          data: {
+            uploadStatus1: uploadStatus[0].created_at,
+            uploadStatus2: uploadStatus[1].created_at,
+          }, 
+          post: newPostStatus
+        })
+      }
+      catch {
+        console.log(err);
+        res.status(500).json({
+          success: false,
+          error: err,
+        });
+      }
     } else {
       return res.status(400).send("Invalid mode provided.");
     }
