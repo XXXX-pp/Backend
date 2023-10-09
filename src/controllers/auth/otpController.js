@@ -41,7 +41,7 @@ export const verifyUserOtp = async (req, res) => {
     if (!email || !otp || !userId) return res.status(404).json({
       status: 404,
       message:'Details cannot be empty'
-    })
+    })  
     
     //Verify user otp
     const validOtp = await verifyOtp(email, otp);
