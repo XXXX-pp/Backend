@@ -4,7 +4,7 @@ import { createPost } from "../../controllers/post/newPostController.js";
 
 const router = Router();
 
-router.post("/new-post",upload.array("file"),createPost)
+router.post("/new-post",upload.array("files", 2),createPost)
 
 export default router;
 
