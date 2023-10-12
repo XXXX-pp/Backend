@@ -16,10 +16,5 @@ export const sendEmail = async (email, message) => {
     html: message
   };
 
-  return new Promise((resolve, reject) => {
-    transport.sendMail(mailOptions, (err, info) => {
-      if (err) reject(err);
-      resolve(info);
-    });
-  });
+  return transport.sendMail(mailOptions);
 };

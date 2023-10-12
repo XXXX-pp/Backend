@@ -6,21 +6,20 @@ export const issueOtp = async (userId, email, username, password) => {
   const saltRounds = +process.env.SALT_WORKER;
   const hashedOTP = await bcrypt.hash(otp, saltRounds);
   const hashedPassword = await bcrypt.hash(password, saltRounds);
-  await saveOtp(userId, email, hashedOTP, username, hashedPassword)
+  const otpSaved = await saveOtp(userId, email, hashedOTP, username.toLowerCase(), hashedPassword)
+     
   return {
     userOtp: otp,
-    timeLeft: `1 hour`,
+    timeLeft: `2 minutes`
   };
 };
 
-export const verifyOtp = async (email, otp, keepAlive = false) => {
+export const verifyOtp = async (email, otp) => {
   const otpDetails= await findOtp(email)
+
   if(!otpDetails){return false}
-  console.log('compareOtp', otp, otpDetails.otp)
+
   const validOtp = await bcrypt.compare(otp, otpDetails.otp)
   if (!validOtp) return false;
-  // To prevent the otp from being used twice, reset the otp.
-  // if (!keepAlive) await issueOtp(email, userId);
-  console.log('otp status:', true)
-  return true;
+  if (validOtp) return true
 };

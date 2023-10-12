@@ -1,9 +1,11 @@
 import { Router } from "express";
-import { verifyUserOtp } from "../../controllers/auth/otpController.js";
+import { resendOtp, verifyUserOtp } from "../../controllers/auth/otpController.js";
 
 const router = Router();
 
 router.post("/verify-otp", verifyUserOtp)
+
+router.post('/resend-otp', resendOtp)
 
 export default router;
 

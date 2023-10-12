@@ -5,33 +5,48 @@ import { sendUserOtp }from "./otpController.js";
 export const createUser = async (req, res) => {
   try {
     const { username, password, email } = req.body;
-    const {posts,postsYouLiked,postsYouSaved}=[] 
+    const {posts,postsYouLiked,postsYouSaved}=[]
 
+    //check for request body
+    if(!username ||!password ||!email) return res.status(404).json({
+      status: 404,
+      message:'Details cannot be empty'
+    })
+    
+    //check if details is already registered
     const userExists = await findUser(username,email)
     
-    //encrypt user password
-    const saltRounds = +process.env.SALT_WORKER;
-    const hashedPassword = await bcrypt.hash(password, saltRounds);
-
-    //if user does not exist create an unverified new user
+    if (userExists) return res.status(409).json({
+      status:409,
+      message:'User with details already exists'
+    })
+    
+    //if user does not exist create the user and send email otp
     if (!userExists){
-      const user = await saveUser(username.toLowerCase(),email,hashedPassword,posts,postsYouLiked,postsYouSaved)
+      const saltRounds = +process.env.SALT_WORKER;
+      const hashedPassword = await bcrypt.hash(password, saltRounds);
+      const userSaved = await saveUser(username.toLowerCase(),email,hashedPassword,posts,postsYouLiked,postsYouSaved)
       
-      //send an otp after user creation
-      const otpStatus = await sendUserOtp(user._id,email,username,password)
-      
-      //if user is created and otp is sent, send a JSON response
-      if(otpStatus.status === false) return res.json({
-        status: 400,
-      });
-      if(otpStatus.status === true) return res.json({
-        status: 201,
-        userId: user._id,
-        email: user.email
-      });
-    };
+      //send otp if user is saved to database
+      if(userSaved){
+        const otpStatus = await sendUserOtp(userSaved._id,email,username,password)
+        if(otpStatus.status === true) return res.status(201).json({
+          status: 201,
+          userId: userSaved._id,
+          email: userSaved.email,
+          message:'Otp sent successfully'
+        });
+
+        if(otpStatus.status === false) return res.status(400).json({
+          status: 400,
+          message:'Failed to send otp, check email'
+        });
+      }   
+    }
   } catch (error) {
-    console.log(error);
-    return res.json({ status: 500});
+    return res.status(500).json({ 
+      status: 500,
+      message:'Server error, please try again later, '+ error.message
+    });
   }
 };
