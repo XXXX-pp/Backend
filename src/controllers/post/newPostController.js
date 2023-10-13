@@ -119,7 +119,7 @@ export const createPost = async (req, res) => {
           post: newPostStatus
         })
       }
-      catch {
+      catch (err) {
         console.log(err);
         res.status(500).json({
           success: false,
