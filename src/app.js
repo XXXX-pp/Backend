@@ -26,7 +26,6 @@ app.use(bodyParser.json({ limit: '10mb' }));
 const allowedOrigins = ['http://localhost:3000'];
 app.use(cors({
   origin: function (origin, callback) {
-    // Check if the origin is in the allowed list or if it's undefined (for non-browser requests).
     if (!origin || allowedOrigins.includes(origin)) {
       callback(null, true);
     } else {
@@ -34,7 +33,7 @@ app.use(cors({
     }
   },
   methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
-  credentials: true,  // Enable credentials (e.g., cookies, authorization headers)
+  credentials: true, 
 }));
 
 app.use(morgan("dev"));
@@ -42,7 +41,6 @@ app.use(express.json({ limit: '10mb' }));
 app.use(cookieParser());
 app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 
-// API ENDPOINTS
 app.get("/", (req, res) => {
   res.send("API SERVER IS RUNNING");
 });
