@@ -5,12 +5,11 @@ import dotenv from "dotenv";
 dotenv.config();
 
 export const generateJwtToken = async (user) => {
-    const userObject = user.toObject();
-    const token = jwt.sign(userObject, process.env.JWT_SECRET, {
+    const token = jwt.sign(user, process.env.JWT_SECRET, {
       expiresIn: process.env.JWT_EXPIRE,
     });
   
     return token;
-  };
+};
 
 export const generateUUID = uuid()

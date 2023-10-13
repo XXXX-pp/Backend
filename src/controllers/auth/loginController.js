@@ -8,7 +8,7 @@ export async function loginUser(req, res) {
 
   try {
     //check for request body
-    if (!email || !username || !password) return res.status(404).json({
+    if (!username || !password) return res.status(404).json({
       status: 404,
       message:'Details cannot be empty'
     }) 
@@ -17,7 +17,7 @@ export async function loginUser(req, res) {
     const user = await findUser(username.toLowerCase(),email)
     
     if (!user){
-      return res.status(404).json({ 
+      return res.status(404).json({
         success: false, 
         data: null, 
         status: 404 , 
@@ -50,8 +50,10 @@ export async function loginUser(req, res) {
       }
   }
   }catch (error) {
+    console.log(error)
     return res.status(500).json({ 
-      message:'Server error, please try again later, '+ error.message
+      message:'Server error, please try again later',
+      status: 500
     });
   }
 }
