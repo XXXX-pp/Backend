@@ -71,11 +71,7 @@ export const createPost = async (req, res) => {
         await updateUserPosts(user.toLowerCase(), newPostStatus.postId);
         res.json({
           success: true,
-          data: {
-          uploadStatus1: uploadStatus[0].created_at,
-          uploadStatus2: uploadStatus[1].created_at,
-        },
-        post: newPostStatus,
+          post: newPostStatus,
         });
       }
     } else if (requestData.mode === 'gallery') {
@@ -108,10 +104,6 @@ export const createPost = async (req, res) => {
         await updateUserPosts(user.toLowerCase(),newPostStatus.postId)
         res.json({
           success: true,
-          data: {
-            uploadStatus1: uploadStatus[0].created_at,
-            uploadStatus2: uploadStatus[1].created_at,
-          },
           post: newPostStatus,
         });
       } catch (err) {
