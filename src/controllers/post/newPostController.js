@@ -11,7 +11,7 @@ export const createPost = async (req, res) => {
     const description = requestData.description
     if (requestData.mode === 'camera') {
       if (!requestData.images || Object.keys(requestData.images).length === 0) {
-        res.status(400).send("No image data provided.");
+        res.json({status: 400, message: 'No image data provided'});
       } else {
       const imageObject = requestData.images || {};
       const imageKeys = Object.keys(imageObject);
@@ -71,7 +71,8 @@ export const createPost = async (req, res) => {
         await updateUserPosts(user.toLowerCase(), newPostStatus.postId);
         res.json({
           success: true,
-          post: newPostStatus,
+          status: 200,
+          message: 'Uploaded successfully'
         });
       }
     } else if (requestData.mode === 'gallery') {
@@ -104,21 +105,19 @@ export const createPost = async (req, res) => {
         await updateUserPosts(user.toLowerCase(),newPostStatus.postId)
         res.json({
           success: true,
-          post: newPostStatus,
+          status: 200,
+          message: 'Uploaded successfully'
         });
       } catch (err) {
         console.log(err);
-        res.status(500).json({
-          success: false,
-          error: err,
-        });
+        res.json({success: false, status: 500, message: 'Something went wrong please try again later'});
       }
     } else {
-      res.status(400).send("Invalid mode provided.");
+       res.json({success: false, status: 500, message: 'invalid mode provided'});
     }
   } catch (error) {
     console.error("Error processing images:", error);
-    res.status(500).send("Error processing images.");
+    res.json({success: false, status: 500, message: 'Error processing messages'});
   }
 };
 

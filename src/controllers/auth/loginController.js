@@ -7,13 +7,12 @@ export async function loginUser(req, res) {
   const { username,email, password } = req.body;
 
   try {
-    //check for request body
+    
     if (!username || !password) return res.status(404).json({
       status: 404,
       message:'Details cannot be empty'
     }) 
-
-    //check if the user exists
+    
     const user = await findUser(username.toLowerCase(),email)
     
     if (!user){
@@ -25,7 +24,6 @@ export async function loginUser(req, res) {
       });
     }
 
-    //if user exists verify the user password
     if(user){
       const passwordMatch = await bcrypt.compare(password, user.password);
       
@@ -38,7 +36,6 @@ export async function loginUser(req, res) {
         });
       }
 
-      //if user password matches send jwt token to login user
       if (passwordMatch){
         const token = await generateJwtToken(user)
         return res.status(200).json({

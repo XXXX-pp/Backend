@@ -13,6 +13,7 @@ import otpRoute from "./routes/auth/otpRoutes.js";
 import newPostRoute from "./routes/post/newPostRoute.js";
 import checkDetailsRoute from "./routes/auth/checkDetailsRoute.js";
 import getPostRoute from "./routes/get/getPostRoute.js";
+import { authenticateUser } from "./utils/middleware.js";
 
 dotenv.config();
 
