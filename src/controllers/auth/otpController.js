@@ -42,7 +42,6 @@ export const verifyUserOtp = async (req, res) => {
       status: false,
       message:'Details cannot be empty'
     })  
-    
     //Verify user otp
     const validOtp = await verifyOtp(email, otp);
     

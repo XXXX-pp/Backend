@@ -26,7 +26,7 @@ export const updateUserStatus = async (userId) => {
       userId,
       { isVerified: true },
       { new: true }
-    ).select('email _id username');
+    ).select('_id username');
   
     return user;
   };
