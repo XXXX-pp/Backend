@@ -1,5 +1,6 @@
 import bcrypt from "bcryptjs"
-import { findOtp,saveOtp } from "../workers/dbWork.js";
+import { findOtp,saveOtp,findUser } from "../workers/dbWork.js";
+
 
 export const issueOtp = async (userId, email, username, password) => {
   const otp = `${Math.floor(1000 + Math.random() * 9000)}`;
@@ -15,11 +16,13 @@ export const issueOtp = async (userId, email, username, password) => {
 };
 
 export const verifyOtp = async (email, otp) => {
+  const userVerified= await findUser("",email)
+  if (userVerified.isVerified) return {status:true, isVerified:userVerified.isVerified}
   const otpDetails= await findOtp(email)
 
-  if(!otpDetails){return false}
+  if(!otpDetails) return {status:false, otpDetails:false}
 
   const validOtp = await bcrypt.compare(otp, otpDetails.otp)
-  if (!validOtp) return false;
-  if (validOtp) return true
+  if (!validOtp) return {status:false, validOtp:false}
+  if (validOtp) return {status:true, validOtp:true}
 };
