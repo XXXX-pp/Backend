@@ -15,11 +15,19 @@ export const createUser = async (req, res) => {
     
     //check if details is already registered
     const userExists = await findUser(username,email)
-    
-    if (userExists) return res.status(409).json({
-      status:409,
-      message:'User with details already exists'
-    })
+    if(userExists){
+      if (userExists.isVerified) return res.status(409).json({
+        status:409,
+        isVerified:userExists.isVerified,
+        message:'User with details already exists, proceed to login'
+      })
+
+      if (!userExists.isVerified) return res.status(409).json({
+        status:409,
+        isVerified:userExists.isVerified,
+        message:'User with details already exists verify otp to continue'
+      })
+    }
     
     //if user does not exist create the user and send email otp
     if (!userExists){
@@ -30,6 +38,7 @@ export const createUser = async (req, res) => {
       //send otp if user is saved to database
       if(userSaved){
         const otpStatus = await sendUserOtp(userSaved._id,email,username,password)
+        if(otpStatus.error) throw new Error('Server could not send otp, login and try again later')
         if(otpStatus.status === true) return res.status(201).json({
           status: 201,
           userId: userSaved._id,
@@ -44,6 +53,7 @@ export const createUser = async (req, res) => {
       }   
     }
   } catch (error) {
+    console.log(error)
     return res.status(500).json({ 
       status: 500,
       message:'Server error, please try again later, '+ error.message

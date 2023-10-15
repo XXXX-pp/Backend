@@ -10,78 +10,72 @@ export const createPost = async (req, res) => {
     const user = requestData.username
     const description = requestData.description
     if (requestData.mode === 'camera') {
+      if (!requestData.images || Object.keys(requestData.images).length === 0) {
+        res.json({status: 400, message: 'No image data provided'});
+      } else {
       const imageObject = requestData.images || {};
       const imageKeys = Object.keys(imageObject);
+        const uploadStatus = [];
+        const uploadPromises = imageKeys.map(async (key) => {
+          const imageData = imageObject[key];
+          const fileBuffer = Buffer.from(imageData, "base64");
+          const publicId = `custom_unique_id_${Date.now()}`;
+          const fileStream = new Readable();
+          fileStream.push(fileBuffer);
+          fileStream.push(null);
 
-      if (imageKeys.length === 0) {
-        return res.status(400).send("No image data provided.");
-      }
-
-      const uploadStatus = [];
-      const uploadPromises = imageKeys.map(async (key) => {
-        const imageData = imageObject[key];
-        const fileBuffer = Buffer.from(imageData, "base64");
-        const publicId = `custom_unique_id_${Date.now()}`;
-        const fileStream = new Readable();
-        fileStream.push(fileBuffer);
-        fileStream.push(null);
-
-        const result = await new Promise((resolve, reject) => {
-          const cloudinaryResponse = cloudinary.uploader.upload_stream(
-            {
-              resource_type: "auto",
-              public_id: publicId,
-            },
-            (error, result) => {
-              if (error) {
-                console.error("Error uploading to Cloudinary:", error);
-                reject(error);
-              } else {
-                resolve(result);
+          const result = await new Promise((resolve, reject) => {
+            const cloudinaryResponse = cloudinary.uploader.upload_stream(
+              {
+                resource_type: "auto",
+                public_id: publicId,
+              },
+              (error, result) => {
+                if (error) {
+                  console.error("Error uploading to Cloudinary:", error);
+                  reject(error);
+                } else {
+                  resolve(result);
+                }
               }
-            }
-          );
-          fileStream.pipe(cloudinaryResponse);
+            );
+            fileStream.pipe(cloudinaryResponse);
+          });
+
+          uploadStatus.push(result.secure_url);
         });
 
-        uploadStatus.push(result.secure_url);
-      });
+        await Promise.all(uploadPromises);
 
-      await Promise.all(uploadPromises);
+        const firstImage = {
+          src: uploadStatus[0],
+          likes: '200',
+          likedBy: [],
+        };
 
-      const firstImage = {
-        src: uploadStatus[0],
-        likes: '200',
-        likedBy: [],
-      };
+        const secondImage = {
+          src: uploadStatus[1],
+          likes: '200',
+          likedBy: [],
+        };
 
-      const secondImage = {
-        src: uploadStatus[1],
-        likes: '200',
-        likedBy: [],
-      };
+        const newPostStatus = await createNewPost(
+          user.toLowerCase(),
+          description,
+          firstImage,
+          secondImage,
+          '1000',
+          generateUUID
+        );
 
-      const newPostStatus = await createNewPost(
-        user.toLowerCase(),
-        description,
-        firstImage,
-        secondImage,
-        '1000',
-        generateUUID
-      );
-
-      await updateUserPosts(user.toLowerCase(), newPostStatus.postId);
-
-      res.json({
-        success: true,
-        data: {
-          uploadStatus1: uploadStatus[0].created_at,
-          uploadStatus2: uploadStatus[1].created_at,
-        },
-        post: newPostStatus,
-      });
-    }  
-    if (requestData.mode === 'gallery') {
+        await updateUserPosts(user.toLowerCase(), newPostStatus.postId);
+        res.json({
+          success: true,
+          status: 200,
+          message: 'Uploaded successfully'
+        });
+      }
+    } else if (requestData.mode === 'gallery') {
       try {
         const uploadStatus=[]
         const user = req.body.username
@@ -109,29 +103,21 @@ export const createPost = async (req, res) => {
         const newPostStatus = await createNewPost(user.toLowerCase(),description,firstImage,secondImage,'1000',generateUUID)
         
         await updateUserPosts(user.toLowerCase(),newPostStatus.postId)
-        
-        res.json({  
+        res.json({
           success: true,
-          data: {
-            uploadStatus1: uploadStatus[0].created_at,
-            uploadStatus2: uploadStatus[1].created_at,
-          }, 
-          post: newPostStatus
-        })
-      }
-      catch {
-        console.log(err);
-        res.status(500).json({
-          success: false,
-          error: err,
+          status: 200,
+          message: 'Uploaded successfully'
         });
+      } catch (err) {
+        console.log(err);
+        res.json({success: false, status: 500, message: 'Something went wrong please try again later'});
       }
     } else {
-      return res.status(400).send("Invalid mode provided.");
+       res.json({success: false, status: 500, message: 'invalid mode provided'});
     }
   } catch (error) {
     console.error("Error processing images:", error);
-    res.status(500).send("Error processing images.");
+    res.json({success: false, status: 500, message: 'Error processing messages'});
   }
 };
 

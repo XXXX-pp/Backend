@@ -28,7 +28,7 @@ export const sendUserOtp = async (userId,email,username,password) => {
       status:false,
     })
   } catch (error) {
-    return error
+    return {error:true,message:error.message}
   }
 }
 
@@ -39,32 +39,47 @@ export const verifyUserOtp = async (req, res) => {
 
     //check for request body
     if (!email || !otp || !userId) return res.status(404).json({
-      status: 404,
+      status: false,
       message:'Details cannot be empty'
     })  
     
     //Verify user otp
     const validOtp = await verifyOtp(email, otp);
+
+    if (validOtp.status && validOtp.isVerified) return res.status(409).json({
+      status: 409,
+      message: "User already verified",
+      })
     
-    if (!validOtp) return res.status(400).json({
-      status: 400,
+      if (!validOtp.status && !validOtp.otpDetails) return res.status(404).json({
+        status: 404,
+        message: "Otp details not found, resend otp",
+        })
+    
+    if (!validOtp.status && !validOtp.validOtp) return res.status(403).json({
+      status: 403,
       message: "Otp details incorrect",
       })
-  
-    //update user status if otp is valid
-    const user = await updateUserStatus(userId)
-    if (user){
-      await deleteOtp(email)
-      const token = await generateJwtToken(user)
-      res.status(200).json({
-        status: 200,
-        message: 'User verified',
+     
+    if (validOtp.status && validOtp.validOtp){
+      //update user status if otp is valid
+      const user = await updateUserStatus(userId)
+      if (user){
+        await deleteOtp(email)
+        const token = await generateJwtToken(user)
+        res.status(200).json({
+          status: true,
+          message: 'User verified',
+          data: user,
         token
-      })
-    } 
+        })
+      }
+    }
   } catch (error) {
     // delete user from database
-    return res.status(500).json({status: false});
+    return res.status(500).json({
+      status:500,
+      message:'Server error, please try again later, '+ error.message    });
   }
 }
 
