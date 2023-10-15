@@ -39,7 +39,7 @@ export const verifyUserOtp = async (req, res) => {
 
     //check for request body
     if (!email || !otp || !userId) return res.status(404).json({
-      status: 404,
+      status: false,
       message:'Details cannot be empty'
     })  
     
@@ -68,9 +68,10 @@ export const verifyUserOtp = async (req, res) => {
         await deleteOtp(email)
         const token = await generateJwtToken(user)
         res.status(200).json({
-          status: 200,
+          status: true,
           message: 'User verified',
-          token
+          data: user,
+        token
         })
       }
     }

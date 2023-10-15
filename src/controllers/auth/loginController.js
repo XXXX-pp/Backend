@@ -7,17 +7,16 @@ export async function loginUser(req, res) {
   const { username,email, password } = req.body;
 
   try {
-    //check for request body
-    if (!email || !username || !password) return res.status(404).json({
+    
+    if (!username || !password) return res.status(404).json({
       status: 404,
       message:'Details cannot be empty'
     }) 
-
-    //check if the user exists
+    
     const user = await findUser(username.toLowerCase(),email)
     
     if (!user){
-      return res.status(404).json({ 
+      return res.status(404).json({
         success: false, 
         data: null, 
         status: 404 , 
@@ -25,7 +24,6 @@ export async function loginUser(req, res) {
       });
     }
 
-    //if user exists verify the user password
     if(user){
       const passwordMatch = await bcrypt.compare(password, user.password);
       
@@ -38,7 +36,6 @@ export async function loginUser(req, res) {
         });
       }
 
-      //if user password matches send jwt token to login user
       if (passwordMatch){
         const token = await generateJwtToken(user)
         return res.status(200).json({
@@ -50,8 +47,10 @@ export async function loginUser(req, res) {
       }
   }
   }catch (error) {
+    console.log(error)
     return res.status(500).json({ 
-      message:'Server error, please try again later, '+ error.message
+      message:'Server error, please try again later',
+      status: 500
     });
   }
 }

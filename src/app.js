@@ -11,24 +11,30 @@ import createUserRoute from "./routes/auth/createUserRoute.js";
 import loginUserRoute from "./routes/auth/loginUserRoute.js";
 import otpRoute from "./routes/auth/otpRoutes.js";
 import newPostRoute from "./routes/post/newPostRoute.js";
-import checkDetailsRoute from "./routes/auth/checkDetailsRoute.js"
-import getPostRoute from './routes/get/getPostRoute.js'
-
+import checkDetailsRoute from "./routes/auth/checkDetailsRoute.js";
+import getPostRoute from "./routes/get/getPostRoute.js";
+import { authenticateUser } from "./utils/middleware.js";
 
 dotenv.config();
 
 connectDB();
 
-
-const port = process.env.PORT 
+const port = process.env.PORT;
 const app = express();
 const server = http.createServer(app);
+app.use(bodyParser.json({ limit: '10mb' }));
 
-app.use(bodyParser.json())
+const allowedOrigins = ['http://localhost:3000'];
 app.use(cors({
-  origin: 'http://localhost:3000',
+  origin: function (origin, callback) {
+    if (!origin || allowedOrigins.includes(origin)) {
+      callback(null, true);
+    } else {
+      callback(new Error('Not allowed by CORS'));
+    }
+  },
   methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
-  credentials: true,
+  credentials: true, 
 }));
 
 app.use(morgan("dev"));
@@ -36,25 +42,23 @@ app.use(express.json({ limit: '10mb' }));
 app.use(cookieParser());
 app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 
-// API ENDPOINTS
 app.get("/", (req, res) => {
   res.send("API SERVER IS RUNNING");
 });
 
-app.use("/user", createUserRoute,loginUserRoute,checkDetailsRoute)
-app.use(otpRoute)
-app.use(newPostRoute)
-app.use(getPostRoute)
-
+app.use("/user", createUserRoute, loginUserRoute, checkDetailsRoute);
+app.use(otpRoute);
+app.use(newPostRoute);
+app.use(getPostRoute);
 
 app.use((err, req, res, next) => {
-   res.locals.message = err.message;
-   res.locals.error = req.app.get("env") === "development" ? err : {};
-   res.status(err.status || 500).json({
-     status: "false",
-     message: err.message,
-   });
-})
+  res.locals.message = err.message;
+  res.locals.error = req.app.get("env") === "development" ? err : {};
+  res.status(err.status || 500).json({
+    status: "false",
+    message: err.message,
+  });
+});
 
 server.listen(port, () => {
   console.log(`SERVER RUNNING ON PORT ${port}`);
