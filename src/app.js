@@ -13,6 +13,7 @@ import otpRoute from "./routes/auth/otpRoutes.js";
 import newPostRoute from "./routes/post/newPostRoute.js";
 import checkDetailsRoute from "./routes/auth/checkDetailsRoute.js";
 import getPostRoute from "./routes/get/getPostRoute.js";
+import getProfileRoute from "./routes/get/getProfileRoute.js"
 
 dotenv.config();
 
@@ -49,6 +50,7 @@ app.use("/user", createUserRoute, loginUserRoute, checkDetailsRoute);
 app.use(otpRoute);
 app.use(newPostRoute);
 app.use(getPostRoute);
+app.use(getProfileRoute)
 
 app.use((err, req, res, next) => {
   res.locals.message = err.message;
