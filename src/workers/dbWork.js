@@ -2,7 +2,7 @@ import { UserModel } from "../model/userModel.js";
 import { OtpModel } from "../model/otpModel.js";
 import { PostModel } from "../model/postModel.js";
 
-export const saveUser = async(username,email,hashedPassword,posts,postYouLiked,postsYouSaved)=>{
+export const saveUser = async(username,email,hashedPassword,posts,postYouLiked,postsYouSaved,totalNoOfLikes)=>{
     const user = await UserModel.create({
         email,
         username,
@@ -10,6 +10,7 @@ export const saveUser = async(username,email,hashedPassword,posts,postYouLiked,p
         posts,
         postYouLiked,
         postsYouSaved,
+        totalNoOfLikes
     });
     return user
 }

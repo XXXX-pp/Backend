@@ -26,8 +26,8 @@ export async function loginUser(req, res) {
 
     if(user){
       const passwordMatch = await bcrypt.compare(password, user.password);
-      const userInfo = {userId: user._id, username: user.username}
-      
+      const userInfo = { userId: user._id, username: user.username, userLikes: user.totalNoOfLikes, no_Of_Posts: user.posts.length }
+  
       if (!passwordMatch) {
         return res.status(401).json({ 
           success: false,  
