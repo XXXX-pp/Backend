@@ -1,5 +1,5 @@
 import jwt from "jsonwebtoken";
-import { v4 as uuid } from 'uuid';
+import { v4 as uuidv4 } from 'uuid';
 import dotenv from "dotenv";
 
 dotenv.config();
@@ -18,4 +18,18 @@ export const generateJwtToken = async (user) => {
     return token;
 };
 
-export const generateUUID = uuid()
+// export const generateUUID = uuidv4()
+
+
+// Create a set to store generated UUIDs
+function generateUniqueUUID() {
+  let newUUID;
+  do {
+    newUUID = uuidv4();
+  } while (generatedUUIDs.has(newUUID));
+  generatedUUIDs.add(newUUID); // Add the new UUID to the set
+  return newUUID;
+}
+let generatedUUIDs = new Set();
+
+export const uniqueUUID = generateUniqueUUID();

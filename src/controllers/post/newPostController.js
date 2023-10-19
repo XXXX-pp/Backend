@@ -1,8 +1,23 @@
 import cloudinary from "../../config/cloudinaryConfig.js";
-import { generateUUID } from "../../utils/utilities.js";
 import { createNewPost, findUser, updateUserPosts } from '../../workers/dbWork.js'
 import { Readable } from 'stream';
 import * as fs from "fs";
+import {v4 as uuidv4} from "uuid"
+
+function extractObjectIdValue(inputString) {
+  if (typeof inputString !== 'string') {
+    return null; // Return null or handle the non-string case as needed
+  }
+
+  const regex = /\("([^"]+)"\)/;
+  const matches = inputString.match(regex);
+
+  if (matches && matches.length > 1) {
+    return matches[1];
+  } else {
+    return null; // Return null or handle the case as needed
+  }
+}
 
 export const createPost = async (req, res) => {
   try { 
@@ -58,14 +73,14 @@ export const createPost = async (req, res) => {
           likes: '200',
           likedBy: [],
         };
-
+        const postId = await uuidv4()
         const newPostStatus = await createNewPost(
           user.toLowerCase(),
           description,
           firstImage,
           secondImage,
           '1000',
-          generateUUID
+          postId
         );
 
         await updateUserPosts(user.toLowerCase(), newPostStatus.postId);
@@ -99,10 +114,9 @@ export const createPost = async (req, res) => {
           likes:'200',
           likedBy:[]
         }
-        
-        const newPostStatus = await createNewPost(user.toLowerCase(),description,firstImage,secondImage,'1000',generateUUID)
-        
-        await updateUserPosts(user.toLowerCase(),newPostStatus.postId)
+        const postId = await uuidv4()
+        const newPostStatus = await createNewPost(user.toLowerCase(),description,firstImage,secondImage,'1000', postId)
+        await updateUserPosts(user.toLowerCase(), newPostStatus.postId)
         res.json({
           success: true,
           status: 200,
