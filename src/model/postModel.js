@@ -19,7 +19,7 @@ const postSchema = new Schema({
     required: true,
   },
   likes:{
-    type: String,
+    type: Number,
   },
   postId:{
     type: String,

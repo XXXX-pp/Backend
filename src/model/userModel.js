@@ -28,7 +28,7 @@ const userSchema = new Schema({
     type: Array,
   },
   totalNoOfLikes: {
-    type: String
+    type: Number
   }
 }, {timestamps:true})
 
