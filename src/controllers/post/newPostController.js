@@ -64,13 +64,13 @@ export const createPost = async (req, res) => {
 
         const firstImage = {
           src: uploadStatus[0],
-          likes: '200',
+          likes: 0,
           likedBy: [],
         };
 
         const secondImage = {
           src: uploadStatus[1],
-          likes: '200',
+          likes: 0,
           likedBy: [],
         };
         const postId = await uuidv4()
@@ -79,7 +79,7 @@ export const createPost = async (req, res) => {
           description,
           firstImage,
           secondImage,
-          '1000',
+          0,
           postId
         );
 
@@ -106,16 +106,16 @@ export const createPost = async (req, res) => {
     
         const firstImage={
           src:uploadStatus[0].url,
-          likes:'200',
+          likes:0,
           likedBy:[]
         }
         const secondImage={
           src:uploadStatus[1].url,
-          likes:'200',
+          likes:0,
           likedBy:[]
         }
         const postId = await uuidv4()
-        const newPostStatus = await createNewPost(user.toLowerCase(),description,firstImage,secondImage,'1000', postId)
+        const newPostStatus = await createNewPost(user.toLowerCase(),description,firstImage,secondImage,0, postId)
         await updateUserPosts(user.toLowerCase(), newPostStatus.postId)
         res.json({
           success: true,
