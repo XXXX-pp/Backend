@@ -34,15 +34,15 @@ export const getProfile = async (req, res) => {
             } else {
                 console.log('Profile not found.'); 
                 res.status(401).json({
-                    message: 'Unauthorised - please try login in'
+                  message: 'Unauthorised - please try login in'
                 })
             }
          })
         .catch((error) => { 
         console.error('Error:', error);
         });
-      } else {
-        console.log('JWT could not be decoded');
-      }
+    } else {
+      console.log('JWT could not be decoded');
+    }
     
 }
