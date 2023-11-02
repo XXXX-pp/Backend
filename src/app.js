@@ -17,6 +17,7 @@ import getProfileRoute from "./routes/get/getProfileRoute.js"
 import getYourPostRoute from "./routes/get/getYourPostRoute.js"
 import likesUpdateRoute from "./routes/update/likesUpdateRoute.js"
 import unlikesUpdateRoute from "./routes/update/unlikesUpdateRoute.js"
+import deletePostRoute from "./routes/delete/deletePostRoute.js"
 
 dotenv.config();
 
@@ -56,6 +57,7 @@ app.use(getProfileRoute)
 app.use(getYourPostRoute)
 app.use(likesUpdateRoute)
 app.use(unlikesUpdateRoute)
+app.use(deletePostRoute)
 
 app.use((err, req, res, next) => {
   res.locals.message = err.message;
