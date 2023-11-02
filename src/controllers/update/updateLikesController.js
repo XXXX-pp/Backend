@@ -74,25 +74,3 @@ export const updateLikes = async (req, res) => {
       }
         
 }
- 
-
- // User has already liked the image, so "unlike" it
-              // const query = { _id: postId };
-              // const updateObject = {
-              //   $inc: { [`${imageType}.likes`]: -1 },
-              //   $pull: { [`${imageType}.likedBy`]: decodedData._id },
-              // };
-        
-              // try {
-              //   const result = await PostModel.updateOne(query, updateObject);
-        
-              //   if (result.nModified === 0) {
-              //     console.log('Update failed: No documents matched the query');
-              //     return res.status(404).json({ message: 'No documents matched the query', status: 404 });
-              //   }
-        
-              //   console.log('Image unliked successfully.');
-              // } catch (error) {
-              //   console.error('Error updating the document:', error);
-              //   return res.status(500).json({ error: 'Server error', status: 500 });
-              // }
