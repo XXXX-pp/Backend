@@ -51,7 +51,10 @@ export const updateLikes = async (req, res) => {
           console.log('You are allowed to like');
           const query = { _id: postId };
           const updateObject = {
-            $inc: { [`${imageType}.likes`]: 1 },
+            $inc: { 
+              [`${imageType}.likes`]: 1,
+              likes: 1
+            },
             $push: { [`${imageType}.likedBy`]: decodedData.user._id },
           };
           const result = await PostModel.updateOne(query, updateObject);

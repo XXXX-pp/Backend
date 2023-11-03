@@ -44,7 +44,10 @@ export const unlikeImage = async (req, res) => {
                 if (userExistsInLikedBy) {
                     const query = { _id: postId };
                     const updateObject = {
-                    $inc: { [`${imageType}.likes`]: -1 },
+                    $inc: { 
+                        [`${imageType}.likes`]: -1,
+                        likes: -1
+                    },
                     $pull: { [`${imageType}.likedBy`]: decodedData.user._id },
                     };
 

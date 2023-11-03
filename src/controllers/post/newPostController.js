@@ -64,9 +64,10 @@ export const createPost = async (req, res) => {
           description,
           firstImage,
           secondImage,
-          0,
           postId
         );
+
+        await newPostStatus.save();
 
         await updateUserPosts(user.toLowerCase(), newPostStatus.postId);
         res.json({
@@ -100,7 +101,8 @@ export const createPost = async (req, res) => {
           likedBy:[]
         }
         const postId = await uuidv4()
-        const newPostStatus = await createNewPost(user.toLowerCase(),description,firstImage,secondImage,0, postId)
+        const newPostStatus = await createNewPost(user.toLowerCase(),description,firstImage,secondImage,postId)
+        await newPostStatus.save();
         await updateUserPosts(user.toLowerCase(), newPostStatus.postId)
         res.json({
           success: true,
