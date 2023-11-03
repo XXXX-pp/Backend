@@ -26,4 +26,9 @@ const postSchema = new Schema({
   },
 },{  timestamps: true});
 
+postSchema.pre('save', function(next) {
+  this.likes = (this.firstImage.likes || 0) + (this.secondImage.likes || 0);
+  next();
+});
+
 export const PostModel = model("Post", postSchema);

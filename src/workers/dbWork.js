@@ -61,7 +61,8 @@ export const deleteOtp = async(email)=>{
     await OtpModel.deleteOne({ email })
 }
 
-export const createNewPost = async(user, description,firstImage,secondImage,likes, postId) => {
+export const createNewPost = async(user, description,firstImage,secondImage,postId) => {
+    const likes = (firstImage.likes || 0) + (secondImage.likes || 0);
     const post = await PostModel.create({
         user,
         description,

@@ -29,8 +29,8 @@ export const getProfile = async (req, res) => {
         getUserById(userId)
         .then((user) => {
             if (user) {
-                const {username, posts, postYouLiked, postsYouSaved, totalNoOfLikes} = user
-                res.status(200).json({username, posts, postYouLiked, postsYouSaved, totalNoOfLikes})
+                const {username, posts, postYouLiked, postsYouSaved, totalNoOfLikes, _id} = user
+                res.status(200).json({username, posts, postYouLiked, postsYouSaved, totalNoOfLikes, _id})
             } else {
                 console.log('Profile not found.'); 
                 res.status(401).json({
