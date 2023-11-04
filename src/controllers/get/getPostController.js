@@ -39,3 +39,21 @@ export const getPostById = async (req, res) => {
     return res.status(500).json({ error: 'Internal server error' });
   }
 };
+
+export const getPostsByLikes = async (req, res) => {
+    // get the token from the request to personalize the feed
+    const token = req.header('Authorization').split(' ')[1];
+    const secretKey = process.env.JWT_SECRET;
+    const decodedData = decodeJwt(token, secretKey)
+    const userId = decodedData.user._id
+  try {
+    const posts = await PostModel
+      .find()
+      .sort({ likes: -1 }) // Sort in descending order based on likes
+      .limit(5); // Limit to 5 posts
+    res.json(posts);
+  } catch (error) {
+    console.error('Error fetching posts:', error);
+    res.status(500).json({ error: 'Server error' });
+  }
+}

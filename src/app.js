@@ -18,6 +18,7 @@ import getYourPostRoute from "./routes/get/getYourPostRoute.js"
 import likesUpdateRoute from "./routes/update/likesUpdateRoute.js"
 import unlikesUpdateRoute from "./routes/update/unlikesUpdateRoute.js"
 import deletePostRoute from "./routes/delete/deletePostRoute.js"
+import getPostsByLikesRoute from "./routes/get/getPostsByLikesRoute.js";
 
 dotenv.config();
 
@@ -58,6 +59,7 @@ app.use(getYourPostRoute)
 app.use(likesUpdateRoute)
 app.use(unlikesUpdateRoute)
 app.use(deletePostRoute)
+app.use(getPostsByLikesRoute)
 
 app.use((err, req, res, next) => {
   res.locals.message = err.message;
