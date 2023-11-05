@@ -1,6 +1,7 @@
 import { UserModel } from "../model/userModel.js";
 import { OtpModel } from "../model/otpModel.js";
 import { PostModel } from "../model/postModel.js";
+import { CommentModel } from "../model/commentModel.js";
 
 export const saveUser = async(username,email,hashedPassword,posts,postYouLiked,postsYouSaved,totalNoOfLikes)=>{
     const user = await UserModel.create({
@@ -72,6 +73,14 @@ export const createNewPost = async(user, description,firstImage,secondImage,post
         postId
     });
     return post
+}
+
+export const createNewCommentSection = async (postId, comments) => {
+    const comment = await CommentModel.create({
+        postId,
+        comments
+    })
+    return comment
 }
 
 
