@@ -21,6 +21,7 @@ import deletePostRoute from "./routes/delete/deletePostRoute.js"
 import getPostsByLikesRoute from "./routes/get/getPostsByLikesRoute.js";
 import commentRoute from "./routes/post/commentRoute.js"
 import getCommentRoute from "./routes/get/getCommentRoute.js"
+import deleteCommentRoute from "./routes/delete/deleteCommentRoute.js"
 
 dotenv.config();
 
@@ -65,6 +66,8 @@ app.use(deletePostRoute)
 app.use(getPostsByLikesRoute)
 app.use(commentRoute)
 app.use(getCommentRoute)
+app.use(deleteCommentRoute)
+
 
 app.use((err, req, res, next) => {
   res.locals.message = err.message;

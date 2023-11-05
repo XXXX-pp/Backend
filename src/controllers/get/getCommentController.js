@@ -18,7 +18,7 @@ export const getComments = async (req, res) => {
   if (decodedData) {
     try {
       const postId = req.params.postId
-      const comment = await CommentModel.findOne({ postId });
+      const comment = await CommentModel.findOne({ postId }).maxTimeMS(30000);
       if (!comment) {
         return res.status(404).json({ message: 'No comments found for the given postId' });
       }
