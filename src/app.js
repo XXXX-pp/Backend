@@ -22,6 +22,8 @@ import getPostsByLikesRoute from "./routes/get/getPostsByLikesRoute.js";
 import commentRoute from "./routes/post/commentRoute.js"
 import getCommentRoute from "./routes/get/getCommentRoute.js"
 import deleteCommentRoute from "./routes/delete/deleteCommentRoute.js"
+import savePostRoute from "./routes/update/savePostRoute.js"
+import unsavePostRoute from "./routes/update/unsavePostRoute.js"
 
 dotenv.config();
 
@@ -67,6 +69,8 @@ app.use(getPostsByLikesRoute)
 app.use(commentRoute)
 app.use(getCommentRoute)
 app.use(deleteCommentRoute)
+app.use(savePostRoute)
+app.use(unsavePostRoute)
 
 
 app.use((err, req, res, next) => {
