@@ -1,5 +1,6 @@
 import { PostModel } from "../../model/postModel.js";
 import jwt from "jsonwebtoken";
+import { UserModel } from "../../model/userModel.js";
 
 function decodeJwt(token, secretKey) {
   try {
@@ -17,12 +18,21 @@ export const getPosts = async (req, res) => {
   const secretKey = process.env.JWT_SECRET;
   const decodedData = decodeJwt(token, secretKey)
   const userId = decodedData.user._id
- try {
-    const items = await PostModel.find().maxTimeMS(40000);
-    return res.json({items, userId})
+  try {
+    const user = await UserModel.findOne({ _id: userId }).exec();
+    const items = await PostModel.find().maxTimeMS(30000);
+    if (user) {
+      const postsYouSaved = user.postsYouSaved;
+      return res.json({ items, userId, postsYouSaved });
+    } else {
+      console.log('User not found');
+      // Handle the case when the user is not found
+      return res.status(404).json({ message: 'User not found' });
+    }
   } catch (error) {
-    console.error(error);
-    res.status(500).json({ error: "Internal server error" });
+    console.error('Error finding the user:', error);
+    // Handle the error as needed
+    return res.status(500).json({ message: 'Internal server error' });
   }
 };
 
