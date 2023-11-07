@@ -4,7 +4,7 @@ import { deletePost } from "../../controllers/delete/deletePostController.js";
 
 
 const router = Router();
-router.delete("/delete-post/:postId", authenticateUser, deletePost);
+router.delete("/delete-post/:postId", deletePost);
 
 export default router;
 

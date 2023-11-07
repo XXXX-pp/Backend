@@ -41,6 +41,7 @@ export const getPostById = async (req, res) => {
   try {
     const post = await PostModel.findOne({ postId });
     if (!post) {
+      console.log('postIDs not found')
       return res.status(404).json({ error: 'Post not found' });
     }
     return res.json(post);
