@@ -1,8 +1,8 @@
 import cloudinary from "../../config/cloudinaryConfig.js";
-import { generateUUID } from "../../utils/utilities.js";
-import { createNewPost, findUser, updateUserPosts } from '../../workers/dbWork.js'
+import { createNewCommentSection, createNewPost, findUser, updateUserPosts } from '../../workers/dbWork.js'
 import { Readable } from 'stream';
 import * as fs from "fs";
+import {v4 as uuidv4} from "uuid"
 
 export const createPost = async (req, res) => {
   try { 
@@ -49,24 +49,28 @@ export const createPost = async (req, res) => {
 
         const firstImage = {
           src: uploadStatus[0],
-          likes: '200',
+          likes: 0,
           likedBy: [],
         };
 
         const secondImage = {
           src: uploadStatus[1],
-          likes: '200',
+          likes: 0,
           likedBy: [],
         };
-
+        const comments = []
+        const postId = await uuidv4()
         const newPostStatus = await createNewPost(
           user.toLowerCase(),
           description,
           firstImage,
           secondImage,
-          '1000',
-          generateUUID
+          postId
         );
+        const newCommentStatus = await createNewCommentSection(postId, comments)
+          
+        await newPostStatus.save();
+        await newCommentStatus.save()
 
         await updateUserPosts(user.toLowerCase(), newPostStatus.postId);
         res.json({
@@ -91,18 +95,21 @@ export const createPost = async (req, res) => {
     
         const firstImage={
           src:uploadStatus[0].url,
-          likes:'200',
+          likes:0,
           likedBy:[]
         }
         const secondImage={
           src:uploadStatus[1].url,
-          likes:'200',
+          likes:0,
           likedBy:[]
         }
-        
-        const newPostStatus = await createNewPost(user.toLowerCase(),description,firstImage,secondImage,'1000',generateUUID)
-        
-        await updateUserPosts(user.toLowerCase(),newPostStatus.postId)
+        const comments = []
+        const postId = await uuidv4()
+        const newPostStatus = await createNewPost(user.toLowerCase(),description,firstImage,secondImage,postId)
+        const newCommentStatus = await createNewCommentSection(postId, comments)
+        await newPostStatus.save();
+        await newCommentStatus.save()
+        await updateUserPosts(user.toLowerCase(), newPostStatus.postId)
         res.json({
           success: true,
           status: 200,

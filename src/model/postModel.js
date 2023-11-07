@@ -19,11 +19,16 @@ const postSchema = new Schema({
     required: true,
   },
   likes:{
-    type: String,
+    type: Number,
   },
   postId:{
     type: String,
   },
 },{  timestamps: true});
+
+postSchema.pre('save', function(next) {
+  this.likes = (this.firstImage.likes || 0) + (this.secondImage.likes || 0);
+  next();
+});
 
 export const PostModel = model("Post", postSchema);

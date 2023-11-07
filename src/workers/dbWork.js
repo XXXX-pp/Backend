@@ -1,8 +1,9 @@
 import { UserModel } from "../model/userModel.js";
 import { OtpModel } from "../model/otpModel.js";
 import { PostModel } from "../model/postModel.js";
+import { CommentModel } from "../model/commentModel.js";
 
-export const saveUser = async(username,email,hashedPassword,posts,postYouLiked,postsYouSaved)=>{
+export const saveUser = async(username,email,hashedPassword,posts,postYouLiked,postsYouSaved,totalNoOfLikes)=>{
     const user = await UserModel.create({
         email,
         username,
@@ -10,6 +11,7 @@ export const saveUser = async(username,email,hashedPassword,posts,postYouLiked,p
         posts,
         postYouLiked,
         postsYouSaved,
+        totalNoOfLikes
     });
     return user
 }
@@ -26,7 +28,7 @@ export const updateUserStatus = async (userId) => {
       userId,
       { isVerified: true },
       { new: true }
-    ).select('email _id username');
+    ).select('_id username');
   
     return user;
   };
@@ -60,7 +62,8 @@ export const deleteOtp = async(email)=>{
     await OtpModel.deleteOne({ email })
 }
 
-export const createNewPost = async(user, description,firstImage,secondImage,likes,postId) => {
+export const createNewPost = async(user, description,firstImage,secondImage,postId) => {
+    const likes = (firstImage.likes || 0) + (secondImage.likes || 0);
     const post = await PostModel.create({
         user,
         description,
@@ -70,6 +73,14 @@ export const createNewPost = async(user, description,firstImage,secondImage,like
         postId
     });
     return post
+}
+
+export const createNewCommentSection = async (postId, comments) => {
+    const comment = await CommentModel.create({
+        postId,
+        comments
+    })
+    return comment
 }
 
 

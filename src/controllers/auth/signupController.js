@@ -6,6 +6,8 @@ export const createUser = async (req, res) => {
   try {
     const { username, password, email } = req.body;
     const {posts,postsYouLiked,postsYouSaved}=[]
+    let totalNoOfLikes = '0';
+   
 
     //check for request body
     if(!username ||!password ||!email) return res.status(404).json({
@@ -33,9 +35,7 @@ export const createUser = async (req, res) => {
     if (!userExists){
       const saltRounds = +process.env.SALT_WORKER;
       const hashedPassword = await bcrypt.hash(password, saltRounds);
-      const userSaved = await saveUser(username.toLowerCase(),email,hashedPassword,posts,postsYouLiked,postsYouSaved)
-      
-      //send otp if user is saved to database
+      const userSaved = await saveUser(username.toLowerCase(),email,hashedPassword,posts,postsYouLiked,postsYouSaved,totalNoOfLikes)
       if(userSaved){
         const otpStatus = await sendUserOtp(userSaved._id,email,username,password)
         if(otpStatus.error) throw new Error('Server could not send otp, login and try again later')
@@ -43,7 +43,7 @@ export const createUser = async (req, res) => {
           status: 201,
           userId: userSaved._id,
           email: userSaved.email,
-          message:'Otp sent successfully'
+          message:'Otp sent successfully',
         });
 
         if(otpStatus.status === false) return res.status(400).json({

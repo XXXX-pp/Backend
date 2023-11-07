@@ -26,6 +26,9 @@ const userSchema = new Schema({
   },
   postsYouSaved:{
     type: Array,
+  },
+  totalNoOfLikes: {
+    type: Number
   }
 }, {timestamps:true})
 
