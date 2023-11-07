@@ -20,28 +20,29 @@ export const deletePost = async (req, res) => {
         const postId = req.params.postId;
         if (decodedData) {
             try {
-              // Find the post by postId
-              const post = await PostModel.findOne({ postId }); // might not find post till i convert stuff
+              const post = await PostModel.findOneAndRemove({ postId });
               if (!post) {
                 console.log('post not found')
                 return res.status(404).json({ message: 'Post not found' });
               }
-              // Find the user by username (assuming this is how you identify users)
+              console.log('deleted from home feed')
               const user = await UserModel.findOne({ username: decodedData.user.username });
               if (!user) {
                 console.log('user not found')
                 return res.status(404).json({ message: 'User not found' });
               }
-              // Check if the user is the creator of the post
               if (user.username === post.user) {
-                if (user.posts.includes(postId)) {
-                  user.posts.pull(postId);
-                  await user.save();
-                  await PostModel.findOneAndDelete(postId);
-                  return res.status(200).json({ message: 'Post deleted successfully' });
-                } else {
-                  return res.status(403).json({ message: 'User does not have permission to delete this post' });
+                const postIndex = user.posts.indexOf(postId);
+
+                if (postIndex === -1) {
+                  console.log('Post not found in user.posts');
+                  return;
                 }
+                
+                user.posts.splice(postIndex, 1);
+                user.postsYouSaved.splice(postIndex, 1)
+                await user.save(); 
+                return res.status(200).json({message: 'success'});
               } else {
                 return res.status(403).json({ message: 'User does not have permission to delete this post' });
               }
