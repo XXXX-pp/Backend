@@ -41,6 +41,7 @@ export const getPostById = async (req, res) => {
   try {
     const post = await PostModel.findOne({ postId });
     if (!post) {
+      console.log('postIDs not found')
       return res.status(404).json({ error: 'Post not found' });
     }
     return res.json(post);
@@ -55,12 +56,11 @@ export const getPostsByLikes = async (req, res) => {
     const token = req.header('Authorization').split(' ')[1];
     const secretKey = process.env.JWT_SECRET;
     const decodedData = decodeJwt(token, secretKey)
-    const userId = decodedData.user._id
   try {
     const posts = await PostModel
       .find()
-      .sort({ likes: -1 }) // Sort in descending order based on likes
-      .limit(5); // Limit to 5 posts
+      .sort({ likes: -1 }) 
+      .limit(5);
     res.json(posts);
   } catch (error) {
     console.error('Error fetching posts:', error);
