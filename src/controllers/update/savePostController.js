@@ -55,14 +55,13 @@ export const unSavePost = (req, res) => {
         const token = req.header('Authorization').split(' ')[1];
         const secretKey = process.env.JWT_SECRET;
         const decodedData = decodeJwt(token, secretKey)
-        const saves = req.body
         if (decodedData) {
             const userId = decodedData.user._id;
           
             UserModel.findOneAndUpdate(
               { _id: userId },
               {
-                $addToSet: { postsYouSaved: { $each: req.body } },
+                $pull: { postsYouSaved: { $in: req.body } }
               },
               { new: true }
             )
