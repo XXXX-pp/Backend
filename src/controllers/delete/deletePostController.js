@@ -12,6 +12,7 @@ function decodeJwt(token, secretKey) {
   }
 }
 
+
 export const deletePost = async (req, res) => {
     try {
         const token = req.header('Authorization').split(' ')[1];
@@ -26,6 +27,7 @@ export const deletePost = async (req, res) => {
                 return res.status(404).json({ message: 'Post not found' });
               }
               console.log('deleted from home feed')
+              // go through every user and see if you can find the id in their saved and delete it 
               const user = await UserModel.findOne({ username: decodedData.user.username });
               if (!user) {
                 console.log('user not found')

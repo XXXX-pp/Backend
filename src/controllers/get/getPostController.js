@@ -41,8 +41,27 @@ export const getPostById = async (req, res) => {
   try {
     const post = await PostModel.findOne({ postId });
     if (!post) {
-      console.log('postIDs not found')
-      return res.status(404).json({ error: 'Post not found' });
+      return res.status(202).json(
+          { 
+            _id: '',
+            user: '', 
+            description: '', 
+            firstImage: {
+              src: '',
+              likes: 0,
+              likedBy: []
+            }, 
+            secondImage: {
+              src: '',
+              likes: 0,
+              likedBy: []
+            },
+            likes: 0,
+            postId: '',
+            createdAt: '',
+            updatedAt: ''
+          }
+        );
     }
     return res.json(post);
   } catch (error) {
@@ -56,14 +75,16 @@ export const getPostsByLikes = async (req, res) => {
     const token = req.header('Authorization').split(' ')[1];
     const secretKey = process.env.JWT_SECRET;
     const decodedData = decodeJwt(token, secretKey)
-  try {
-    const posts = await PostModel
-      .find()
-      .sort({ likes: -1 }) 
-      .limit(5);
-    res.json(posts);
-  } catch (error) {
-    console.error('Error fetching posts:', error);
-    res.status(500).json({ error: 'Server error' });
-  }
+    if (decodedData) {
+      try {
+        const posts = await PostModel
+          .find()
+          .sort({ likes: -1 }) 
+          .limit(5);
+        res.json(posts);
+      } catch (error) {
+        console.error('Error fetching posts:', error);
+        res.status(500).json({ error: 'Server error' });
+      }
+    }
 }
