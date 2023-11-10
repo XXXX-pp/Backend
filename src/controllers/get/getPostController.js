@@ -43,23 +43,8 @@ export const getPostById = async (req, res) => {
     if (!post) {
       return res.status(202).json(
           { 
-            _id: '',
-            user: '', 
-            description: '', 
-            firstImage: {
-              src: '',
-              likes: 0,
-              likedBy: []
-            }, 
-            secondImage: {
-              src: '',
-              likes: 0,
-              likedBy: []
-            },
-            likes: 0,
-            postId: '',
-            createdAt: '',
-            updatedAt: ''
+            description: 'Post no longer exists', 
+            postId: postId
           }
         );
     }
