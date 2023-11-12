@@ -1,6 +1,7 @@
 import { PostModel } from "../../model/postModel.js";
 import jwt from "jsonwebtoken";
 import { UserModel } from "../../model/userModel.js";
+import { CommentModel } from "../../model/commentModel.js";
 
 function decodeJwt(token, secretKey) {
   try {
@@ -11,6 +12,7 @@ function decodeJwt(token, secretKey) {
     return null;
   }
 }
+
 
 export const deletePost = async (req, res) => {
     try {
@@ -25,7 +27,6 @@ export const deletePost = async (req, res) => {
                 console.log('post not found')
                 return res.status(404).json({ message: 'Post not found' });
               }
-              console.log('deleted from home feed')
               const user = await UserModel.findOne({ username: decodedData.user.username });
               if (!user) {
                 console.log('user not found')
@@ -38,7 +39,8 @@ export const deletePost = async (req, res) => {
                   console.log('Post not found in user.posts');
                   return;
                 }
-                
+                // find comment object and delete it too
+                await CommentModel.deleteOne({ postId: postId });
                 user.posts.splice(postIndex, 1);
                 user.postsYouSaved.splice(postIndex, 1)
                 await user.save(); 
