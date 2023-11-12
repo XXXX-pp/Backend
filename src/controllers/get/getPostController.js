@@ -20,7 +20,7 @@ export const getPosts = async (req, res) => {
   const userId = decodedData.user._id
   try {
     const user = await UserModel.findOne({ _id: userId }).exec();
-    const items = await PostModel.find().maxTimeMS(30000);
+    const items = await PostModel.find().sort({ createdAt: -1 }).maxTimeMS(30000);
     if (user) {
       const postsYouSaved = user.postsYouSaved;
       return res.json({ items, userId, postsYouSaved });
@@ -39,7 +39,7 @@ export const getPosts = async (req, res) => {
 export const getPostById = async (req, res) => {
   const postId = req.params.postId;
   try {
-    const post = await PostModel.findOne({ postId });
+    const post = await PostModel.findOne({ postId }).maxTimeMS(30000);;
     if (!post) {
       return res.status(202).json(
           { 
@@ -63,7 +63,7 @@ export const getPostsByLikes = async (req, res) => {
     if (decodedData) {
       try {
         const posts = await PostModel
-          .find()
+          .find().maxTimeMS(30000)
           .sort({ likes: -1 }) 
           .limit(5);
         res.json(posts);
