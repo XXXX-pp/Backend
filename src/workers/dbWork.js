@@ -16,9 +16,9 @@ export const saveUser = async(username,email,hashedPassword,posts,postYouLiked,p
     return user
 }
 
-export const findUser = async(username,email) =>{
+export const findUser = async(username,email,id) =>{
     const user = await UserModel.findOne(
-        { $or: [{ username:username },{ email:email }] }
+        { $or: [{ username:username },{ email:email },{_id:id}] }
     ).lean();
     return user
 }
@@ -33,9 +33,9 @@ export const updateUserStatus = async (userId) => {
     return user;
   };
 
-export const updateUserPosts = async(user,postId)=>{
+export const updateUserPosts = async(username,postId)=>{
     const userPostStatus = await UserModel.updateOne(
-        { username: user },
+        { username },
         { $push: {posts: postId} },
         { new: true }
     );
@@ -74,6 +74,26 @@ export const createNewPost = async(user, description,firstImage,secondImage,post
     });
     return post
 }
+export const getPost = async(postId)=>{
+  const posts = await PostModel.find({}).maxTimeMS(30000)
+
+  async function byLikes(){
+    const postsById = await PostModel
+    .find()
+    .sort({ likes: -1 }) 
+    .limit(5);
+
+    return postsById
+  }
+
+  async function byId(postId){
+    const postsById = await PostModel.findOne({postId:postId})
+
+    return postsById
+  }
+  return {posts,byLikes:await byLikes(),byId:await byId(postId)}
+  
+}
 
 export const createNewCommentSection = async (postId, comments) => {
     const comment = await CommentModel.create({
@@ -83,6 +103,20 @@ export const createNewCommentSection = async (postId, comments) => {
     return comment
 }
 
+export const updatePostComment = async (comment,commentId)=>{
+  const result = await CommentModel.updateOne(
+    { postId: comment.postId },
+    {
+      $push: {
+        comments: { username: comment.username, comment: comment.comment, commentId: commentId },
+      },
+    }
+  )
+}
 
+export const getPostComments=async(postId)=>{
+  const comment = await CommentModel.findOne({ postId }).maxTimeMS(30000);
+  return comment
+}
 
 

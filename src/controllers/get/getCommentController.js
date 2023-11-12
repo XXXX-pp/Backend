@@ -1,31 +1,24 @@
 import jwt from "jsonwebtoken";
 import { CommentModel } from "../../model/commentModel.js";
-
-function decodeJwt(token, secretKey) {
-    try {
-      const decoded = jwt.verify(token, secretKey);
-      return decoded;
-    } catch (error) {
-      console.error('JWT verification error:', error.message);
-      return null;
-    }
-}
+import { decodeJwt } from "../../utils/utilities.js";
+import { getPostComments } from "../../workers/dbWork.js";
 
 export const getComments = async (req, res) => {
   const token = req.header('Authorization').split(' ')[1]
   const secretKey = process.env.JWT_SECRET;
   const decodedData = decodeJwt(token, secretKey)
+  const postId = req.params.postId
+
   if (decodedData) {
     try {
-      const postId = req.params.postId
-      const comment = await CommentModel.findOne({ postId }).maxTimeMS(30000);
+      const comment = await getPostComments(postId)
       if (!comment) {
-        return res.status(404).json({ message: 'No comments found for the given postId' });
+        return res.status(404).json({status:404})
       }
-      res.json(comment.comments)
+      res.status(200).json(comment.comments)
     } catch (error) {
       console.error('Error while fetching comments:', error);
-      res.status(500).json({ message: 'Error while fetching comments' });
+      res.status(500).json({status:500})
     }
   }
 }
