@@ -91,7 +91,16 @@ export const getPost = async(postId)=>{
 
     return postsById
   }
-  return {posts,byLikes:await byLikes(),byId:await byId(postId)}
+
+  async function homeFeed(){
+    const posts = await PostModel
+    .find()
+    .sort({ createdAt: -1 })
+    .limit(5);
+
+    return posts
+  }
+  return {homeFeed: await homeFeed(), byLikes:await byLikes(), byId:await byId(postId)}
   
 }
 

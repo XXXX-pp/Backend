@@ -9,10 +9,10 @@ export const getPosts = async (req, res) => {
   const userId = decodedData.user._id
   try {
     const user = await findUser(null,null,userId)
-    const {posts} = await getPost()
+    const {homeFeed} = await getPost()
     if (user) {
       const postsYouSaved = user.postsYouSaved;
-      return res.status(200).json({ posts, userId, postsYouSaved });
+      return res.status(200).json({ homeFeed, userId, postsYouSaved });
     } else {
       console.log('User not found');
       // Handle the case when the user is not found
