@@ -112,20 +112,31 @@ export const createNewCommentSection = async (postId, comments) => {
     return comment
 }
 
-export const updatePostComment = async (comment,commentId)=>{
+export const updatePostComment = async (comment,commentId) => {
   const result = await CommentModel.updateOne(
     { postId: comment.postId },
     {
       $push: {
-        comments: { username: comment.username, comment: comment.comment, commentId: commentId },
+        comments: {
+          username: comment.username,
+          comment: comment.comment,
+          commentId: commentId,
+          createdAt: new Date(),
+        },
       },
     }
-  )
+  );
+  return result;
 }
 
 export const getPostComments=async(postId)=>{
-  const comment = await CommentModel.findOne({ postId }).maxTimeMS(30000);
-  return comment
+  const result = await CommentModel
+  .findOne({ postId })
+  .select('comments')
+  .maxTimeMS(10000);
+
+  const comments = await result ? result.comments : [];
+  return comments
 }
 
 

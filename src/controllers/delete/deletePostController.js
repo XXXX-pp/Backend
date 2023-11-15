@@ -34,15 +34,21 @@ export const deletePost = async (req, res) => {
               }
               if (user.username === post.user) {
                 const postIndex = user.posts.indexOf(postId);
+                const savedPostsIndex = user.postsYouSaved.indexOf(postId)
 
                 if (postIndex === -1) {
                   console.log('Post not found in user.posts');
                   return;
                 }
+
+                if (savedPostsIndex === -1) {
+                  console.log('Post not found in user.postsYouSaved');
+                  return;
+                }
                 // find comment object and delete it too
                 await CommentModel.deleteOne({ postId: postId });
                 user.posts.splice(postIndex, 1);
-                user.postsYouSaved.splice(postIndex, 1)
+                user.postsYouSaved.splice(savedPostsIndex, 1)
                 await user.save(); 
                 return res.status(200).json({message: 'success'});
               } else {
