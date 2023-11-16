@@ -28,7 +28,7 @@ export const getPostById = async (req, res) => {
     const {byId} = await getPost(postId)    
     if (!byId) {
       return res.status(202).json({
-        _id: "",
+        _id: postId,
         description: "Post no longer exists"
       });
     }
