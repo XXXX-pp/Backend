@@ -1,4 +1,3 @@
-import jwt from "jsonwebtoken";
 import { decodeJwt } from "../../utils/utilities.js";
 import { getPostComments } from "../../workers/dbWork.js";
 

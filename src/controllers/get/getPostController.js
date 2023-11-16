@@ -2,7 +2,6 @@ import { decodeJwt } from "../../utils/utilities.js";
 import { findUser, getPost } from "../../workers/dbWork.js";
 
 export const getPosts = async (req, res) => {
-  // get the token from the request to personalize the feed
   const token = req.header('Authorization').split(' ')[1];
   const secretKey = process.env.JWT_SECRET;
   const decodedData = decodeJwt(token, secretKey)
@@ -15,12 +14,10 @@ export const getPosts = async (req, res) => {
       return res.status(200).json({ homeFeed, userId, postsYouSaved });
     } else {
       console.log('User not found');
-      // Handle the case when the user is not found
       return res.status(404)
     }
   } catch (error) {
     console.error('Error finding the user:', error);
-    // Handle the error as needed
     return res.status(500).json({status:500});
   }
 }
@@ -30,8 +27,10 @@ export const getPostById = async (req, res) => {
   try {
     const {byId} = await getPost(postId)    
     if (!byId) {
-      console.log('postIDs not found')
-      return res.status(404).json({status:404});
+      return res.status(202).json({
+        _id: "",
+        description: "Post no longer exists"
+      });
     }
     return res.status(200).json(byId)
   } catch (error) {
@@ -41,7 +40,6 @@ export const getPostById = async (req, res) => {
 };
 
 export const getPostsByLikes = async (req, res) => {
-    // get the token from the request to personalize the feed
     const token = req.header('Authorization').split(' ')[1];
     const secretKey = process.env.JWT_SECRET;
     const decodedData = decodeJwt(token, secretKey)

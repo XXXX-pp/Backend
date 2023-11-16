@@ -75,8 +75,6 @@ export const createNewPost = async(user, description,firstImage,secondImage,post
     return post
 }
 export const getPost = async(postId)=>{
-  const posts = await PostModel.find({}).maxTimeMS(30000)
-
   async function byLikes(){
     const postsById = await PostModel
     .find()
