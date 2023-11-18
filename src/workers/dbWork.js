@@ -19,7 +19,7 @@ export const saveUser = async(username,email,hashedPassword,posts,postYouLiked,p
 export const findUser = async(username,email,id) =>{
     const user = await UserModel.findOne(
         { $or: [{ username:username },{ email:email },{_id:id}] }
-    ).lean();
+    ).lean()
     return user
 }
 
@@ -74,10 +74,10 @@ export const createNewPost = async(user, description,firstImage,secondImage,post
     });
     return post
 }
-export const getPost = async(postId)=>{
+export const getPost = async(postId) => {
   async function byLikes(){
     const postsById = await PostModel
-    .find()
+    .find().maxTimeMS(5000)
     .sort({ likes: -1 }) 
     .limit(5);
 
@@ -86,19 +86,10 @@ export const getPost = async(postId)=>{
 
   async function byId(postId){
     const postsById = await PostModel.findOne({postId:postId})
-
     return postsById
   }
 
-  async function homeFeed(){
-    const posts = await PostModel
-    .find()
-    .sort({ createdAt: -1 })
-    .limit(5);
-
-    return posts
-  }
-  return {homeFeed: await homeFeed(), byLikes:await byLikes(), byId:await byId(postId)}
+  return {byLikes:await byLikes(), byId:await byId(postId)}
   
 }
 
