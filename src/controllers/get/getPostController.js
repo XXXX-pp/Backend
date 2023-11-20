@@ -27,7 +27,8 @@ export const getPosts = async (req, res) => {
     const user = await findUserWithRetry(userId);
     const skip = (pageParam - 1) * limit;
     const postsCount = await PostModel.countDocuments();
-    const posts = await PostModel.find().maxTimeMS(5000)
+    const posts = await PostModel.find()
+    .sort({ createdAt: -1 })
     .skip(skip)
     .limit(limit);
     if (user) {
