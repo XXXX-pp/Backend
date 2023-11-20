@@ -2,6 +2,7 @@ import jwt from "jsonwebtoken";
 import { v4 as uuidv4 } from 'uuid';
 import dotenv from "dotenv";
 import { createNewCommentSection, createNewPost, updateUserPosts } from "../workers/dbWork.js";
+import { promises as fsPromises } from 'fs'; // Use fs.promises for promise-based file operations
 
 import { Readable } from 'stream';
 import * as fs from "fs";
@@ -27,9 +28,6 @@ export const generateJwtToken = async (user) => {
 export function decodeJwt(token, secretKey) {
     return jwt.verify(token, secretKey)
 }
-
-// export const generateUUID = uuidv4()
-
 
 // Create a set to store generated UUIDs
 function generateUniqueUUID() {
@@ -91,6 +89,47 @@ export const uploadImageFile = async(files)=>{
   }
   return imageUrl
 }
+
+
+export const uploadMediaFile = async (files) => {
+  const mediaUrls = [];
+
+  for (let i = 0; i < files.length; i++) {
+    const file = files[i];
+    const path = file.path;
+
+    const isImage = file.mimetype.startsWith('image');
+    const isVideo = file.mimetype.startsWith('video');
+
+    if (isImage) {
+      // Handle image upload
+      const publicId = `custom_unique_id_${Date.now()}`;
+      const result = await cloudinary.uploader.upload(path, { public_id: publicId });
+      await unlinkFile(path);
+      mediaUrls.push(result.secure_url);
+    } else if (isVideo) {
+      // Handle video upload
+      const publicId = `video_${Date.now()}`;
+      const result = await cloudinary.uploader.upload(path, { public_id: publicId, resource_type: 'video' });
+      await unlinkFile(path);
+      mediaUrls.push(result.secure_url);
+    } else {
+      console.log(`Unsupported file type: ${file.mimetype}`);
+    }
+  }
+
+  return mediaUrls;
+};
+
+async function unlinkFile(path) {
+  try {
+    await fsPromises.unlink(path);
+    console.log(`File ${path} deleted successfully`);
+  } catch (error) {
+    console.error(`Error deleting file ${path}:`, error);
+  }
+}
+
 
 export const newPost = async(imageUrl,username,description,comments)=>{
   const firstImage = {

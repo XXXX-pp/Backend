@@ -2,6 +2,7 @@ import { PostModel } from "../../model/postModel.js";
 import jwt from "jsonwebtoken";
 import { UserModel } from "../../model/userModel.js";
 import { CommentModel } from "../../model/commentModel.js";
+import cloudinary from "../../config/cloudinaryConfig.js";
 
 function decodeJwt(token, secretKey) {
   try {
@@ -13,6 +14,26 @@ function decodeJwt(token, secretKey) {
   }
 }
 
+async function deleteImagesFromCloudinary(publicIds) {
+  try {
+    const results = await Promise.all(publicIds.map(async (publicId) => {
+      const result = await cloudinary.uploader.destroy(publicId);
+      console.log(`Deletion result for ${publicId}:`, result);
+      return result;
+    }));
+
+    return results;
+  } catch (error) {
+    console.error('Error deleting images from Cloudinary:', error);
+    throw error;
+  }
+}
+
+
+function getPublicIdFromCloudinaryUrl(url) {
+  const match = url.match(/\/v\d+\/([^\/.]+)\./);
+  return match ? match[1] : null;
+}
 
 export const deletePost = async (req, res) => {
     try {
@@ -27,6 +48,11 @@ export const deletePost = async (req, res) => {
                 console.log('post not found')
                 return res.status(404).json({ message: 'Post not found' });
               }
+              const firstImagePublicId = await getPublicIdFromCloudinaryUrl(post.firstImage.src);
+              const secondImagePublicId = await getPublicIdFromCloudinaryUrl(post.secondImage.src);
+              const publicIdsToDelete = [firstImagePublicId, secondImagePublicId].filter(Boolean);
+              await deleteImagesFromCloudinary(publicIdsToDelete);
+              console.log('images deleted from cloudinary')
               const user = await UserModel.findOne({ username: decodedData.user.username });
               if (!user) {
                 console.log('user not found')
@@ -34,13 +60,15 @@ export const deletePost = async (req, res) => {
               }
               if (user.username === post.user) {
                 const postIndex = user.posts.indexOf(postId);
+                const savePostIndex = user.postsYouSaved.indexOf(postId)
 
                 if (postIndex === -1) {
                   console.log('Post not found in user.posts');
                   return;
                 }
-                // find comment object and delete it too
+
                 await CommentModel.deleteOne({ postId: postId });
+                user.postsYouSaved.splice(savePostIndex, 1)
                 user.posts.splice(postIndex, 1);
                 await user.save(); 
                 return res.status(200).json({message: 'success'});
