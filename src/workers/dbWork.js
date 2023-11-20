@@ -62,7 +62,7 @@ export const deleteOtp = async(email)=>{
     await OtpModel.deleteOne({ email })
 }
 
-export const createNewPost = async(user, description,firstImage,secondImage,postId) => {
+export const createNewPost = async(user, description,firstImage,secondImage,postId, noOfComments) => {
     const likes = (firstImage.likes || 0) + (secondImage.likes || 0);
     const post = await PostModel.create({
         user,
@@ -70,7 +70,8 @@ export const createNewPost = async(user, description,firstImage,secondImage,post
         firstImage:firstImage,
         secondImage:secondImage,
         likes,
-        postId
+        postId,
+        noOfComments
     });
     return post
 }
@@ -101,22 +102,40 @@ export const createNewCommentSection = async (postId, comments) => {
     return comment
 }
 
-export const updatePostComment = async (comment,commentId) => {
-  const result = await CommentModel.updateOne(
-    { postId: comment.postId },
-    {
-      $push: {
-        comments: {
-          username: comment.username,
-          comment: comment.comment,
-          commentId: commentId,
-          createdAt: new Date(),
+export const updatePostComment = async (comment, commentId) => {
+  try {
+    const result = await CommentModel.updateOne(
+      { postId: comment.postId },
+      {
+        $push: {
+          comments: {
+            username: comment.username,
+            comment: comment.comment,
+            commentId: commentId,
+            createdAt: new Date(),
+          },
         },
-      },
+      }
+    );
+
+    if (result.nModified === 0) {
+      throw new Error('Failed to update comments.');
     }
-  );
-  return result;
-}
+
+    await PostModel.updateOne(
+      { postId: comment.postId },
+      {
+        $inc: { noOfComments: 1 },
+      }
+    );
+
+    return result;
+  } catch (error) {
+    console.error('Error updating post comment:', error.message);
+    throw error;
+  }
+};
+
 
 export const getPostComments=async(postId)=>{
   const result = await CommentModel

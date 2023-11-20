@@ -144,6 +144,7 @@ export const newPost = async(imageUrl,username,description,comments)=>{
     likedBy: [],
   }
 
+  const noOfComments = 0
   const postId = uuidv4()
 
   const post = await createNewPost(
@@ -151,7 +152,8 @@ export const newPost = async(imageUrl,username,description,comments)=>{
     description,
     firstImage,
     secondImage,
-    postId
+    postId,
+    noOfComments
   )
   await createNewCommentSection(postId, comments)
     

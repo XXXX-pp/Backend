@@ -32,10 +32,10 @@ export const getPosts = async (req, res) => {
     .skip(skip)
     .limit(limit);
     if (user) {
-      const postsYouSaved = user.postsYouSaved;
+      const postsYouSaved = user.result.postsYouSaved
       return res.status(200).json({ 
         posts, 
-        postsCount, 
+        postsCount,
         userId, 
         postsYouSaved, 
         currentPage: pageParam, 
