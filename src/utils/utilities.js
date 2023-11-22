@@ -92,6 +92,11 @@ export const uploadImageFile = async(files)=>{
   return imageUrl
 }
 
+export const deleteImageFile = async(firstImage,secondImage)=>{
+    const result = await cloudinary.uploader.destroy(firstImage&&secondImage).then(callback);
+    return result
+}
+
 export const newPost = async(imageUrl,username,description,comments)=>{
   const firstImage = {
     src: imageUrl[0],

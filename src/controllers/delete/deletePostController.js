@@ -1,6 +1,7 @@
 import { PostModel } from "../../model/postModel.js";
 import jwt from "jsonwebtoken";
 import { UserModel } from "../../model/userModel.js";
+import { deleteImageFile } from "../../utils/utilities.js";
 
 function decodeJwt(token, secretKey) {
   try {
@@ -21,6 +22,8 @@ export const deletePost = async (req, res) => {
         if (decodedData) {
             try {
               const post = await PostModel.findOneAndRemove({ postId });
+              const result = await deleteImageFile(post.firstImage,post.secondImage)
+              console.log(result)
               if (!post) {
                 console.log('post not found')
                 return res.status(404).json({ message: 'Post not found' });
