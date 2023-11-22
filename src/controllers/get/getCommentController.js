@@ -1,5 +1,3 @@
-import jwt from "jsonwebtoken";
-import { CommentModel } from "../../model/commentModel.js";
 import { decodeJwt } from "../../utils/utilities.js";
 import { getPostComments } from "../../workers/dbWork.js";
 
@@ -15,7 +13,13 @@ export const getComments = async (req, res) => {
       if (!comment) {
         return res.status(404).json({status:404})
       }
-      res.status(200).json(comment.comments)
+      if (comment && Array.isArray(comment)) {
+        const reversedComments = comment.slice().reverse();
+        res.json(reversedComments)
+      } else {
+        console.error('Invalid or missing comments:', comment);
+        return [];
+      }
     } catch (error) {
       console.error('Error while fetching comments:', error);
       res.status(500).json({status:500})

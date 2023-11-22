@@ -24,6 +24,9 @@ const postSchema = new Schema({
   postId:{
     type: String,
   },
+  noOfComments: {
+    type: Number
+  }
 },{  timestamps: true});
 
 postSchema.pre('save', function(next) {
