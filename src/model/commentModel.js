@@ -10,6 +10,6 @@ const commentSchema = new Schema({
         type: Array,
         required: true
     }
-})
+},{  timestamps: true})
 
 export const CommentModel = model("Comment", commentSchema);

@@ -19,7 +19,7 @@ export const saveUser = async(username,email,hashedPassword,posts,postYouLiked,p
 export const findUser = async(username,email,id) =>{
     const user = await UserModel.findOne(
         { $or: [{ username:username },{ email:email },{_id:id}] }
-    ).lean();
+    ).lean()
     return user
 }
 
@@ -62,7 +62,7 @@ export const deleteOtp = async(email)=>{
     await OtpModel.deleteOne({ email })
 }
 
-export const createNewPost = async(user, description,firstImage,secondImage,postId) => {
+export const createNewPost = async(user, description,firstImage,secondImage,postId, noOfComments) => {
     const likes = (firstImage.likes || 0) + (secondImage.likes || 0);
     const post = await PostModel.create({
         user,
@@ -70,16 +70,15 @@ export const createNewPost = async(user, description,firstImage,secondImage,post
         firstImage:firstImage,
         secondImage:secondImage,
         likes,
-        postId
+        postId,
+        noOfComments
     });
     return post
 }
-export const getPost = async(postId)=>{
-  const posts = await PostModel.find({}).maxTimeMS(30000)
-
+export const getPost = async(postId) => {
   async function byLikes(){
     const postsById = await PostModel
-    .find()
+    .find().maxTimeMS(5000)
     .sort({ likes: -1 }) 
     .limit(5);
 
@@ -88,10 +87,10 @@ export const getPost = async(postId)=>{
 
   async function byId(postId){
     const postsById = await PostModel.findOne({postId:postId})
-
     return postsById
   }
-  return {posts,byLikes:await byLikes(),byId:await byId(postId)}
+
+  return {byLikes:await byLikes(), byId:await byId(postId)}
   
 }
 
@@ -103,20 +102,49 @@ export const createNewCommentSection = async (postId, comments) => {
     return comment
 }
 
-export const updatePostComment = async (comment,commentId)=>{
-  const result = await CommentModel.updateOne(
-    { postId: comment.postId },
-    {
-      $push: {
-        comments: { username: comment.username, comment: comment.comment, commentId: commentId },
-      },
+export const updatePostComment = async (comment, commentId) => {
+  try {
+    const result = await CommentModel.updateOne(
+      { postId: comment.postId },
+      {
+        $push: {
+          comments: {
+            username: comment.username,
+            comment: comment.comment,
+            commentId: commentId,
+            createdAt: new Date(),
+          },
+        },
+      }
+    );
+
+    if (result.nModified === 0) {
+      throw new Error('Failed to update comments.');
     }
-  )
-}
+
+    await PostModel.updateOne(
+      { postId: comment.postId },
+      {
+        $inc: { noOfComments: 1 },
+      }
+    );
+
+    return result;
+  } catch (error) {
+    console.error('Error updating post comment:', error.message);
+    throw error;
+  }
+};
+
 
 export const getPostComments=async(postId)=>{
-  const comment = await CommentModel.findOne({ postId }).maxTimeMS(30000);
-  return comment
+  const result = await CommentModel
+  .findOne({ postId })
+  .select('comments')
+  .maxTimeMS(10000);
+
+  const comments = await result ? result.comments : [];
+  return comments
 }
 
 

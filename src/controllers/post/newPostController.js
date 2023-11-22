@@ -1,4 +1,4 @@
-import { newPost, uploadImageFile, uploadImageStream } from "../../utils/utilities.js";
+import { newPost, uploadImageFile, uploadImageStream, uploadMediaFile } from "../../utils/utilities.js";
 
 export const createPost = async (req, res) => {
   try { 
@@ -10,7 +10,7 @@ export const createPost = async (req, res) => {
       await newPost(imageUrl,username,description,comments)
     }  
     if (mode === 'gallery') {
-      const imageUrl = await uploadImageFile(req.files)
+      const imageUrl = await uploadMediaFile(req.files)
       await newPost(imageUrl,username,description,comments)
     }
     res.status(200).json({
