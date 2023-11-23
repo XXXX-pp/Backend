@@ -90,6 +90,7 @@ export const getPostsByLikes = async (req, res) => {
     const token = req.header('Authorization').split(' ')[1];
     const secretKey = process.env.JWT_SECRET;
     const decodedData = decodeJwt(token, secretKey)
+  
   try {
     const {byLikes} = await getPost()
     res.status(200).json(byLikes);
