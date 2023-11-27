@@ -31,62 +31,69 @@ async function deleteImagesFromCloudinary(publicIds) {
 
 
 function getPublicIdFromCloudinaryUrl(url) {
-  const match = url.match(/\/v\d+\/([^\/.]+)\./);
+  const match = url?.match(/\/v\d+\/([^\/.]+)\./);
   return match ? match[1] : null;
 }
 
 export const deletePost = async (req, res) => {
-    try {
-        const token = req.header('Authorization').split(' ')[1];
-        const secretKey = process.env.JWT_SECRET;
-        const decodedData = decodeJwt(token, secretKey)
-        const postId = req.params.postId;
-        if (decodedData) {
-            try {
-              const post = await PostModel.findOneAndRemove({ postId });
-              const result = await deleteImageFile(post.firstImage,post.secondImage)
-              console.log(result)
-              if (!post) {
-                console.log('post not found')
-                return res.status(404).json({ message: 'Post not found' });
-              }
-              const firstImagePublicId = await getPublicIdFromCloudinaryUrl(post.firstImage.src);
-              const secondImagePublicId = await getPublicIdFromCloudinaryUrl(post.secondImage.src);
-              const publicIdsToDelete = [firstImagePublicId, secondImagePublicId].filter(Boolean);
-              await deleteImagesFromCloudinary(publicIdsToDelete);
-              console.log('images deleted from cloudinary')
-              const user = await UserModel.findOne({ username: decodedData.user.username });
-              if (!user) {
-                console.log('user not found')
-                return res.status(404).json({ message: 'User not found' });
-              }
-              if (user.username === post.user) {
-                const postIndex = user.posts.indexOf(postId);
-                const savePostIndex = user.postsYouSaved.indexOf(postId)
+  try {
+    const token = req.header('Authorization').split(' ')[1];
+    const secretKey = process.env.JWT_SECRET;
+    const decodedData = decodeJwt(token, secretKey);
 
-                if (postIndex === -1) {
-                  console.log('Post not found in user.posts');
-                  return;
-                }
-
-                await CommentModel.deleteOne({ postId: postId });
-                user.postsYouSaved.splice(savePostIndex, 1)
-                user.posts.splice(postIndex, 1);
-                await user.save(); 
-                return res.status(200).json({message: 'success'});
-              } else {
-                return res.status(403).json({ message: 'User does not have permission to delete this post' });
-              }
-            } catch (error) {
-              console.error(error);
-              return res.status(500).json({ message: 'Internal Server Error' });
-            }
-          } else {
-            return res.status(404).json({ message: 'Could not verify token' });
-        }
-        
-    } catch (error) {
-        console.error(error);
-        return res.status(500).json({ message: 'Internal Server Error' });
+    if (!decodedData) {
+      return res.status(404).json({ message: 'Could not verify token' });
     }
-}
+
+    const postId = req.params.postId;
+
+    try {
+      const post = await PostModel.findOneAndRemove({ postId });
+
+      if (!post) {
+        console.log('Post not found');
+        return res.status(404).json({ message: 'Post not found' });
+      }
+
+      const firstImagePublicId = await getPublicIdFromCloudinaryUrl(post.firstImage.src);
+      const secondImagePublicId = await getPublicIdFromCloudinaryUrl(post.secondImage.src);
+      const publicIdsToDelete = [firstImagePublicId, secondImagePublicId].filter(Boolean);
+
+      await deleteImagesFromCloudinary(publicIdsToDelete);
+      console.log('Images deleted from Cloudinary');
+
+      const user = await UserModel.findOne({ username: decodedData.user.username });
+
+      if (!user) {
+        console.log('User not found');
+        return res.status(404).json({ message: 'User not found' });
+      }
+
+      if (user.username === post.user) {
+        const postIndex = user.posts.indexOf(postId);
+        const savePostIndex = user.postsYouSaved.indexOf(postId);
+
+        if (postIndex === -1) {
+          console.log('Post not found in user.posts');
+          return res.status(404).json({ message: 'Post not found in user.posts' });
+        }
+
+        await CommentModel.deleteOne({ postId: postId });
+        user.postsYouSaved.splice(savePostIndex, 1);
+        user.posts.splice(postIndex, 1);
+        await user.save();
+
+        return res.status(200).json({ message: 'Success' });
+      } else {
+        return res.status(403).json({ message: 'User does not have permission to delete this post' });
+      }
+    } catch (error) {
+      console.error('Error deleting post:', error);
+      return res.status(500).json({ message: 'Internal Server Error' });
+    }
+  } catch (error) {
+    console.error('Error in deletePost:', error);
+    return res.status(500).json({ message: 'Internal Server Error' });
+  }
+};
+
