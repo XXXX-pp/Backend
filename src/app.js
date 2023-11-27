@@ -6,6 +6,7 @@ import http from "http";
 import connectDB from "./config/db.js";
 import bodyParser from "body-parser";
 import dotenv from "dotenv"
+import cron from 'node-cron'
 
 import createUserRoute from "./routes/auth/createUserRoute.js";
 import loginUserRoute from "./routes/auth/loginUserRoute.js";
@@ -24,6 +25,7 @@ import getCommentRoute from "./routes/get/getCommentRoute.js"
 import deleteCommentRoute from "./routes/delete/deleteCommentRoute.js"
 import savePostRoute from "./routes/update/savePostRoute.js"
 import unsavePostRoute from "./routes/update/unsavePostRoute.js"
+import { deleteUser } from "./workers/dbWork.js";
 
 dotenv.config();
 
@@ -80,6 +82,11 @@ app.use((err, req, res, next) => {
     status: "false",
     message: err.message,
   });
+});
+
+cron.schedule('* * 29 * *', () => {
+  deleteUser
+  console.log('users vetted')
 });
 
 server.listen(port, () => {

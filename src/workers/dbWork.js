@@ -23,10 +23,24 @@ export const findUser = async(username,email,id) =>{
     return user
 }
 
+export const deleteUser = async() =>{
+  const user = await UserModel.deleteMany({isVerified:false})
+  return user
+}
+
 export const updateUserStatus = async (userId) => {
     const user = await UserModel.findByIdAndUpdate(
       userId,
       { isVerified: true },
+      { new: true }
+    ).select('_id username');
+  
+    return user;
+  };
+  export const updateUserPassword = async (userId,password) => {
+    const user = await UserModel.findOneAndUpdate(
+      userId,
+      { password: password },
       { new: true }
     ).select('_id username');
   
