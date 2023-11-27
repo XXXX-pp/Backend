@@ -47,6 +47,16 @@ export const updateUserStatus = async (userId) => {
     return user;
   };
 
+  export const updateUsername = async (userId,username) => {
+    const user = await UserModel.findOneAndUpdate(
+      userId,
+      { username: username },
+      { new: true }
+    ).select('_id username');
+  
+    return user;
+  };
+
 export const updateUserPosts = async(username,postId)=>{
     const userPostStatus = await UserModel.updateOne(
         { username },
