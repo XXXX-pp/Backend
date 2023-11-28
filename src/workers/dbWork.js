@@ -66,6 +66,10 @@ export const updateUserPosts = async(username,postId)=>{
     return userPostStatus
 }
 
+export const deleteUserAccount = async(email)=>{
+  await UserModel.deleteOne({ email })
+}
+
 export const saveOtp = async(userId,email,hashedOTP,username,hashedPassword)=>{
     await OtpModel.create({
         userId,

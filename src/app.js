@@ -25,7 +25,7 @@ import getCommentRoute from "./routes/get/getCommentRoute.js"
 import deleteCommentRoute from "./routes/delete/deleteCommentRoute.js"
 import savePostRoute from "./routes/update/savePostRoute.js"
 import unsavePostRoute from "./routes/update/unsavePostRoute.js"
-import { deleteUser } from "./workers/dbWork.js";
+import deleteUserAccount  from "./routes/delete/deleteUserAccount.js";
 
 dotenv.config();
 
@@ -67,6 +67,7 @@ app.use(getYourPostRoute)
 app.use(likesUpdateRoute)
 app.use(unlikesUpdateRoute)
 app.use(deletePostRoute)
+app.use(deleteUserAccount)
 app.use(getPostsByLikesRoute)
 app.use(commentRoute)
 app.use(getCommentRoute)
