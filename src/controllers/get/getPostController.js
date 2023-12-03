@@ -72,7 +72,7 @@ export const getPosts = async (req, res) => {
 export const getPostById = async (req, res) => {
   const postId = req.params.postId;
   try {
-    const {byId} = await getPost(postId)    
+    const {byId} = await getPost(postId)  
     if (!byId) {
       return res.status(202).json({
         _id: postId,
