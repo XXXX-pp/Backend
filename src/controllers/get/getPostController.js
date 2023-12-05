@@ -41,6 +41,7 @@ export const getPosts = async (req, res) => {
 
       const skip = (pageParam - 1) * limit;
       const postsCount = await PostModel.countDocuments();
+      console.log(postsCount)
       const posts = await PostModel.find()
         .sort({ createdAt: -1 })
         .skip(skip)
@@ -72,7 +73,7 @@ export const getPosts = async (req, res) => {
 export const getPostById = async (req, res) => {
   const postId = req.params.postId;
   try {
-    const {byId} = await getPost(postId)    
+    const {byId} = await getPost(postId)  
     if (!byId) {
       return res.status(202).json({
         _id: postId,
@@ -90,12 +91,18 @@ export const getPostsByLikes = async (req, res) => {
     const token = req.header('Authorization').split(' ')[1];
     const secretKey = process.env.JWT_SECRET;
     const decodedData = decodeJwt(token, secretKey)
-  
-  try {
-    const {byLikes} = await getPost()
-    res.status(200).json(byLikes);
-  } catch (error) {
-    console.error('Error fetching posts:', error);
-    res.status(500).json({ status:500 });
-  }
+    const userId = decodedData.user._id
+    try {
+      const user = await findUserWithRetry(userId);
+      if (!user) {
+        console.log('User not found');
+        return res.status(404).json({ status: 404, message: 'User not found' });
+      }
+      const postsYouSaved = user.result.postsYouSaved;
+      const {byLikes} = await getPost()
+      res.status(200).json({byLikes, postsYouSaved});
+    } catch (error) {
+      console.error('Error fetching posts:', error);
+      res.status(500).json({ status:500 });
+    }
 }

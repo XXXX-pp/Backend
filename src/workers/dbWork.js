@@ -17,10 +17,17 @@ export const saveUser = async(username,email,hashedPassword,posts,postYouLiked,p
 }
 
 export const findUser = async(username,email,id) =>{
+  try {
     const user = await UserModel.findOne(
-        { $or: [{ username:username },{ email:email },{_id:id}] }
-    ).lean()
-    return user
+      { $or: [{ username: username }, { email: email }, { _id: id }] }
+    ).lean();
+    
+    return user;
+  } catch (error) {
+    console.error('Error finding user:', error);
+    throw error; 
+  }
+  
 }
 
 export const deleteUser = async() =>{
