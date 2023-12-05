@@ -1,5 +1,6 @@
 import { PostModel } from "../../model/postModel.js";
 import jwt from "jsonwebtoken";
+import { UserModel } from "../../model/userModel.js";
 
 function decodeJwt(token, secretKey) {
   try {
@@ -70,7 +71,11 @@ export const updateLikes = async (req, res) => {
             console.log('Update failed: No documents matched the query');
             return res.status(404).json({ message: 'No documents matched the query', status: 404 });
           }
-
+          const user = await UserModel.findOneAndUpdate(
+            {_id:decodedData.user._id},
+            {$push:{ postYouLiked:{postId}} },
+            { new: true }
+          ).select('_id username');
           console.log('Image liked successfully.');
         } catch (error) {
           console.error('Error updating the document:', error);
