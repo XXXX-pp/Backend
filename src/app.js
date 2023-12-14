@@ -87,7 +87,6 @@ app.use((err, req, res, next) => {
 
 cron.schedule('* * 29 * *', () => {
   deleteUser
-  console.log('users vetted')
 });
 
 server.listen(port, () => {

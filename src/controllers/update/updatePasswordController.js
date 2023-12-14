@@ -24,7 +24,6 @@ export const updatePassword = async (req, res) => {
       return res.status(401).json({ message: 'Unauthorized request', status: 401 });
     }
      
-    console.log(decodedData)
     const user = findUser("",email)
     updateUserPassword(decodedData.id,newPassword)
     

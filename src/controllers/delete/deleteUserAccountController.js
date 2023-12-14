@@ -6,9 +6,6 @@ import { findUser} from "../../workers/dbWork.js";
 
 export const deleteUserAccount = async (req, res) => {
   try {
-    // const token = req.header('Authorization').split(' ')[1];
-    // const secretKey = process.env.JWT_SECRET;
-    // const decodedData = decodeJwt(token, secretKey);
     const {email} = req.body
 
     const user = await findUser('',email,)

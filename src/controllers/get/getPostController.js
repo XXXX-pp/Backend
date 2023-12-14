@@ -41,7 +41,6 @@ export const getPosts = async (req, res) => {
 
       const skip = (pageParam - 1) * limit;
       const postsCount = await PostModel.countDocuments();
-      console.log(postsCount)
       const posts = await PostModel.find()
         .sort({ createdAt: -1 })
         .skip(skip)
